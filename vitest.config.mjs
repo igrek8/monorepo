@@ -1,17 +1,16 @@
-import { defaultExclude, defineConfig } from 'vitest/config';
+import { coverageConfigDefaults, defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
     coverage: {
       exclude: [
-        ...defaultExclude,
-        '**/bin/**',
-        '**/docs/**',
+        ...coverageConfigDefaults.exclude,
+        '**/dist',
         '**/coverage/**',
         '**/build/**',
-        '**/*.d.ts',
-        '**/*.test-d.ts',
+        '**/docs/**',
         '**/examples/**',
+        '**/migrations/**',
         '**/index.ts',
       ],
       reporter: ['lcov', 'html'],

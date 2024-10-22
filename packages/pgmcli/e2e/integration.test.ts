@@ -74,7 +74,7 @@ describe.sequential('pgmcli', () => {
 
   describe('install', () => {
     it('creates migrations table', async () => {
-      await install(options);
+      await install(options, config);
       await expect(listTables(db)).resolves.toStrictEqual(['migrations']);
     });
   });
