@@ -1,0 +1,10 @@
+# Directories
+
+.docusaurus/
+coverage/
+data/
+node_modules/
+
+# Files
+
+.DS_Store
