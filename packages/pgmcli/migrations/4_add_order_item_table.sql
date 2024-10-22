@@ -1,0 +1,11 @@
+CREATE TABLE order_item (
+  id SERIAL PRIMARY KEY,
+  order_id INT REFERENCES "order"(id) ON DELETE CASCADE,
+  book_id INT REFERENCES book(id),
+  quantity INT NOT NULL,
+  price_at_purchase NUMERIC(10, 2) NOT NULL
+);
+
+-- DO NOT REMOVE - THIS LINE SEPARATES APPLY AND REVERT OPERATIONS. REVERT BEGIN
+
+DROP TABLE order_item;
