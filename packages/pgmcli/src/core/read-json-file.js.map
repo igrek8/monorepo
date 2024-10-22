@@ -1,0 +1,1 @@
+{"version":3,"file":"read-json-file.js","sourceRoot":"","sources":["read-json-file.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,QAAQ,EAAE,MAAM,aAAa,CAAC;AAEvC,MAAM,CAAC,KAAK,UAAU,YAAY,CAAC,QAAgB;IACjD,OAAO,IAAI,CAAC,KAAK,CAAC,MAAM,QAAQ,CAAC,QAAQ,EAAE,EAAE,QAAQ,EAAE,OAAO,EAAE,CAAC,CAAC,CAAC;AACrE,CAAC"}
