@@ -1,0 +1,15 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`pgmcli > create > creates a new migration file 1`] = `
+"DO $$
+BEGIN
+  RAISE LOG 'Applying';
+END $$;
+
+-- DO NOT REMOVE - THIS LINE SEPARATES APPLY AND REVERT OPERATIONS. REVERT BEGIN
+
+DO $$
+BEGIN
+  RAISE LOG 'Reverting';
+END $$;"
+`;
