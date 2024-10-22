@@ -1,0 +1,53 @@
+{
+  "name": "pgmcli",
+  "description": "Apply or revert migrations for PostgreSQL",
+  "author": "7078731+igrek8@users.noreply.github.com",
+  "license": "MIT",
+  "version": "2.0.1",
+  "type": "module",
+  "keywords": [
+    "postgres",
+    "migrations",
+    "cli"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/igrek8/monorepo"
+  },
+  "bugs": {
+    "url": "https://github.com/igrek8/monorepo/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "bin": "dist/pgmcli.js",
+  "files": [
+    "dist",
+    "schema.json"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "watch": "tsc -w",
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest --run",
+    "test:coverage": "vitest --run --coverage",
+    "start": "node --no-warnings --loader ts-node/esm src/pgmcli.ts"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "commander": "^12.1.0",
+    "pg": "^8.13.0"
+  },
+  "devDependencies": {
+    "@types/pg": "8.11.10",
+    "@vitest/coverage-v8": "2.1.3",
+    "ajv": "8.12.0",
+    "commander": "11.0.0",
+    "pg": "8.11.3",
+    "prettier": "3.3.3",
+    "typescript": "5.4.3",
+    "vitest": "2.1.3"
+  }
+}
