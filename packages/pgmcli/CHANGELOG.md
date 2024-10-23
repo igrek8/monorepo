@@ -1,5 +1,11 @@
 # pgmcli
 
+## 3.0.3
+
+### Patch Changes
+
+- cacc5ea: Switched back to use CommonJS until ESM is stable
+
 ## 3.0.2
 
 ### Patch Changes
