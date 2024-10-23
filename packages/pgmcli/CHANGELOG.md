@@ -1,5 +1,11 @@
 # pgmcli
 
+## 3.0.2
+
+### Patch Changes
+
+- 27de3b5: Removed declaration and source-maps files from dist
+
 ## 3.0.1
 
 ### Patch Changes
