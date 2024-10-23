@@ -1,4 +1,4 @@
-import { strict as assert } from 'assert';
+import assert from 'assert/strict';
 import { mkdir, writeFile } from 'fs/promises';
 import { basename, dirname, extname, join } from 'path';
 
@@ -78,7 +78,7 @@ export interface CreateOptions {
 
 const extensions = Object.keys(templates).join(', ');
 
-export async function create(options: CreateOptions, console = global.console) {
+export async function create(options: CreateOptions, console = globalThis.console) {
   const fileExtension = extname(options.name);
   const fileName = basename(options.name, fileExtension);
   const fileContent = templates[fileExtension]?.replace('<revert_tag>', options.tag);

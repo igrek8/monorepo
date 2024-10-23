@@ -2,7 +2,7 @@
 
 import { program } from 'commander';
 
-import { create, templates } from './actions/create.js';
+import { create, templates, type CreateOptions } from './actions/create.js';
 import { DEFAULT_DIR, DEFAULT_TAG } from './core/constants.js';
 import { resolveConfig } from './core/resolve-config.js';
 
@@ -17,5 +17,5 @@ program
   .requiredOption('--dir <name>', 'migrations directory', config?.dir ?? DEFAULT_DIR)
   .requiredOption('--tag <name>', 'tag where revert block begins', config?.tag ?? DEFAULT_TAG)
   .option('--config <path>', 'config path')
-  .action(create)
+  .action((options: CreateOptions) => create(options))
   .parse();
