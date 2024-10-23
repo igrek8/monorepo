@@ -1,5 +1,11 @@
 # pgmcli
 
+## 3.0.1
+
+### Patch Changes
+
+- d3732b8: fix: create threw console.info is undefined
+
 ## 3.0.0
 
 ### Major Changes
