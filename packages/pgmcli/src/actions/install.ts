@@ -1,8 +1,8 @@
 import { mkdir } from 'fs/promises';
 import pg from 'pg';
 
-import { Config } from '../core/config.interface.js';
-import { DefaultCommandOptions } from '../core/default-command-options.interface.js';
+import type { Config } from '../core/config.interface.js';
+import type { DefaultCommandOptions } from '../core/default-command-options.interface.js';
 
 export type InstallOptions = DefaultCommandOptions;
 

@@ -17,7 +17,7 @@ export interface ApplyOptions extends DefaultCommandOptions {
   logLevel: LogLevel;
 }
 
-export async function apply(options: ApplyOptions, config?: Config, console = global.console) {
+export async function apply(options: ApplyOptions, config?: Config, console = globalThis.console) {
   const db = new pg.Client({
     ...config?.client,
     host: options.host,
@@ -41,7 +41,7 @@ export async function apply(options: ApplyOptions, config?: Config, console = gl
       getMigrations(resolve(options.dir)),
       getAppliedMigrations(db, table),
     ]);
-    checkIntegrity({ applied, migrations });
+    checkIntegrity(migrations, applied);
     if (options.until) {
       if (!migrations.has(options.until)) {
         throw new Error(`Migration ${options.until} not found`);

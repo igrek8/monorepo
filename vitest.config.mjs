@@ -2,6 +2,7 @@ import { coverageConfigDefaults, defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
+    clearMocks: true,
     coverage: {
       exclude: [
         ...coverageConfigDefaults.exclude,
@@ -12,6 +13,8 @@ export default defineConfig({
         '**/examples/**',
         '**/migrations/**',
         '**/index.ts',
+        '**/pgmcli-*.ts',
+        '**/pgmcli.ts',
       ],
       reporter: ['lcov', 'html'],
     },

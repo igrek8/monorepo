@@ -3,8 +3,8 @@ import { resolve } from 'path';
 import pg from 'pg';
 
 import { checkIntegrity } from '../core/check-integrity.js';
-import { Config } from '../core/config.interface.js';
-import { DefaultCommandOptions } from '../core/default-command-options.interface.js';
+import type { Config } from '../core/config.interface.js';
+import type { DefaultCommandOptions } from '../core/default-command-options.interface.js';
 import { getAppliedMigrations } from '../core/get-applied-migrations.js';
 import { getMigrations } from '../core/get-migrations.js';
 import { LogLevel, getConsoleLevel, toServerSeverity } from '../core/logging.js';
@@ -17,7 +17,7 @@ export interface RevertOptions extends DefaultCommandOptions {
   logLevel: LogLevel;
 }
 
-export async function revert(options: RevertOptions, config?: Config, console = global.console) {
+export async function revert(options: RevertOptions, config?: Config, console = globalThis.console) {
   const db = new pg.Client({
     ...config?.client,
     host: options.host,
@@ -41,7 +41,7 @@ export async function revert(options: RevertOptions, config?: Config, console = 
       getMigrations(resolve(options.dir)),
       getAppliedMigrations(db, table),
     ]);
-    checkIntegrity({ applied, migrations });
+    checkIntegrity(migrations, applied);
     if (!migrations.has(options.until)) {
       throw new Error(`Migration ${options.until} not found`);
     }

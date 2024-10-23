@@ -92,7 +92,6 @@ describe.sequential('pgmcli', () => {
 
   describe('apply', () => {
     it('applies the first 3 migrations', async () => {
-      info.mockReset();
       await apply(
         {
           ...options,
@@ -108,7 +107,6 @@ describe.sequential('pgmcli', () => {
     });
 
     it('skips if until migration is already applied', async () => {
-      info.mockReset();
       await apply(
         {
           ...options,
@@ -139,7 +137,6 @@ describe.sequential('pgmcli', () => {
     });
 
     it('shows the status of the migrations', async () => {
-      info.mockReset();
       await status(options, config, logger);
       expect(info).toHaveBeenNthCalledWith(1, 'applied: 1_add_customer_table.sql');
       expect(info).toHaveBeenNthCalledWith(2, 'applied: 2_add_book_table.sql');
@@ -170,7 +167,6 @@ describe.sequential('pgmcli', () => {
     });
 
     it('shows the status of the migrations', async () => {
-      info.mockReset();
       await status(options, config, logger);
       expect(info).toHaveBeenNthCalledWith(1, 'applied: 1_add_customer_table.sql');
       expect(info).toHaveBeenNthCalledWith(2, 'applied: 2_add_book_table.sql');
@@ -196,7 +192,6 @@ describe.sequential('pgmcli', () => {
     });
 
     it('skips if until migration is already reverted', async () => {
-      info.mockReset();
       await revert(
         {
           ...options,
@@ -227,7 +222,6 @@ describe.sequential('pgmcli', () => {
     });
 
     it('shows the status of the migrations', async () => {
-      info.mockReset();
       await status(options, config, logger);
       expect(info).toHaveBeenNthCalledWith(1, 'applied: 1_add_customer_table.sql');
       expect(info).toHaveBeenNthCalledWith(2, 'applied: 2_add_book_table.sql');
@@ -237,7 +231,6 @@ describe.sequential('pgmcli', () => {
     });
 
     it('reverts the last 3 migrations', async () => {
-      info.mockReset();
       await revert(
         {
           ...options,
@@ -253,7 +246,6 @@ describe.sequential('pgmcli', () => {
     });
 
     it('shows the status of the migrations', async () => {
-      info.mockReset();
       await status(options, config, logger);
       expect(info).toHaveBeenNthCalledWith(1, 'pending: 1_add_customer_table.sql');
       expect(info).toHaveBeenNthCalledWith(2, 'pending: 2_add_book_table.sql');

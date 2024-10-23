@@ -5,9 +5,10 @@ import TabItem from '@theme/TabItem';
 
 export interface InstallSectionProps {
   name: string;
+  global?: boolean;
 }
 
-export default function InstallSection({ name }: InstallSectionProps) {
+export default function InstallSection({ name, global }: InstallSectionProps) {
   return (
     <Tabs>
       <TabItem value="npm" label="npm" default>
@@ -31,7 +32,7 @@ export default function InstallSection({ name }: InstallSectionProps) {
         <br />
         <br />
         <CodeBlock language="shell" title="terminal">
-          npm install {name}
+          npm install {global ? `-g ${name}` : name}
         </CodeBlock>
       </TabItem>
 
@@ -52,7 +53,7 @@ export default function InstallSection({ name }: InstallSectionProps) {
         <br />
         <br />
         <CodeBlock language="shell" title="terminal">
-          yarn add {name}
+          yarn {global ? `global add ${name}` : `add ${name}`}
         </CodeBlock>
       </TabItem>
 

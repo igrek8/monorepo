@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "description": "Config for pgmcli",
+  "description": "pgmcli configuration schema",
   "type": "object",
   "additionalProperties": false,
   "properties": {
@@ -8,23 +8,18 @@
       "type": "string"
     },
     "host": {
-      "description": "PostgreSQL server host",
       "type": "string"
     },
     "port": {
-      "description": "PostgreSQL server port",
       "type": "integer"
     },
     "user": {
-      "description": "PostgreSQL user",
       "type": "string"
     },
     "password": {
-      "description": "PostgreSQL password",
       "type": "string"
     },
     "db": {
-      "description": "PostgreSQL database",
       "type": "string"
     },
     "dir": {
@@ -36,14 +31,14 @@
       "type": "string"
     },
     "tag": {
-      "description": "Tag to separate apply and revert blocks when using an SQL file",
+      "description": "A tag to separate apply and revert blocks using SQL",
       "type": "string"
     },
     "logLevel": {
       "enum": ["DEBUG", "LOG", "INFO", "NOTICE", "WARNING", "ERROR"]
     },
     "client": {
-      "description": "Options to pass to pg client",
+      "description": "Additional options passed into node-postgres instance",
       "type": "object"
     }
   }

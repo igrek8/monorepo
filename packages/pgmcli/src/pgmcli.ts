@@ -2,12 +2,10 @@
 
 import { program } from 'commander';
 
-import { pkg } from './core/pkg-info.js';
-
 program
-  .name(pkg.name)
-  .version(pkg.version)
-  .description(pkg.description)
+  .name('pgmcli')
+  .version(process.env.npm_package_version ?? '0.0.0')
+  .description('A command-line tool to manage Postgres migrations')
   .command('install', 'create migrations table')
   .command('uninstall', 'drop migrations table')
   .command('status', 'show status')

@@ -4,4 +4,169 @@ import InstallSection from '@site/src/components/InstallSection';
 
 ## Installation
 
-<InstallSection name="pgmcli" />
+<InstallSection name="pgmcli" global />
+
+## Optional Config
+
+You can optionally create a `.pgmcli` file in your project root to store your connection details. This file will be automatically loaded when running `pgmcli` commands. You can override these values by passing them as flags to the command. You can specify the path to the config file using the `--config` flag.
+
+```json title=".pgmcli"
+{
+  "$schema": "https://raw.githubusercontent.com/igrek8/monorepo/main/packages/pgmcli/src/core/schema.json",
+  "user": "myuser",
+  "table": "migration",
+  "db": "mydb",
+  "client": {
+    "ssl": false
+  }
+}
+```
+
+## Commands
+
+### Initial Setup
+
+```text title="pgmcli install -h"
+Creates migrations directory and table
+
+Options:
+  --host <string>          host
+  --port <number>          port
+  -u, --user <string>      user
+  -p, --password <string>  password
+  --db <name>              database
+  --dir <name>             migrations directory (default: "migrations")
+  --table <name>           migrations table (default: "migrations")
+  --config <path>          config path (default: ".pgmcli")
+  -h, --help               display help for command
+```
+
+### Create Migration
+
+```text title="pgmcli create -h"
+Creates a migration file
+
+Options:
+  --name <name>    migration file name (.ts, .js, .cjs, .mjs, .mts, .sql)
+  --plan           show plan
+  --dir <name>     migrations directory (default: "migrations")
+  --tag <name>     tag where revert block begins (default: "REVERT BEGIN")
+  --config <path>  config path
+  -h, --help       display help for command
+```
+
+### Status
+
+```text title="pgmcli status -h"
+Shows migrations statuses
+
+Options:
+  --host <string>          host
+  --port <number>          port
+  -u, --user <string>      user
+  -p, --password <string>  password
+  --db <name>              database
+  --dir <name>             migrations directory (default: "migrations")
+  --table <name>           migrations table (default: "migrations")
+  --config <path>          config path (default: ".pgmcli")
+  -h, --help               display help for command
+```
+
+### Apply Migrations
+
+```text title="pgmcli apply -h"
+Applies migrations
+
+Options:
+  --host <string>          host
+  --port <number>          port
+  -u, --user <string>      user
+  -p, --password <string>  password
+  --db <name>              database
+  --dir <name>             migrations directory (default: "migrations")
+  --table <name>           migrations table (default: "migrations")
+  --config <path>          config path (default: ".pgmcli")
+  --until <migration>      apply until the specified migration (inclusive)
+  --plan                   show plan
+  --log-level <level>      log level (choices: "DEBUG", "LOG", "INFO", "NOTICE", "WARNING", "ERROR", default: "INFO")
+  --meta <jsonb>           extra meta associated with apply
+  --tag <name>             tag where apply block ends (default: "REVERT BEGIN")
+  -h, --help               display help for command
+```
+
+### Revert Migrations
+
+```text title="pgmcli revert -h"
+Reverts migrations
+
+Options:
+  --host <string>          host
+  --port <number>          port
+  -u, --user <string>      user
+  -p, --password <string>  password
+  --db <name>              database
+  --dir <name>             migrations directory (default: "migrations")
+  --table <name>           migrations table (default: "migrations")
+  --config <path>          config path (default: ".pgmcli")
+  --until <migration>      revert until the specified migration (inclusive)
+  --plan                   show plan
+  --log-level <level>      log level (choices: "DEBUG", "LOG", "INFO", "NOTICE", "WARNING",
+                           "ERROR", default: "INFO")
+  --tag <name>             tag where revert block begins (default: "REVERT BEGIN")
+  -h, --help               display help for command
+```
+
+### Uninstall
+
+```text title="pgmcli uninstall -h"
+Drops migrations table
+
+Options:
+  --host <string>          host
+  --port <number>          port
+  -u, --user <string>      user
+  -p, --password <string>  password
+  --db <name>              database
+  --dir <name>             migrations directory (default: "migrations")
+  --table <name>           migrations table (default: "migrations")
+  --config <path>          config path (default: ".pgmcli")
+  -h, --help               display help for command
+```
+
+## Integration
+
+### GitHub Actions
+
+You can verify migrations in your GitHub CI workflow by following this [guide](https://docs.github.com/en/actions/use-cases-and-examples/using-containerized-services/creating-postgresql-service-containers).
+
+```yaml title=".github/workflows/job-verify.yml"
+name: Verify Migrations
+
+on: workflow_call
+
+jobs:
+  verification:
+    runs-on: ubuntu-latest
+    container: node:22
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      POSTGRES_HOST: postgres
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Initialize migrations
+        run: npx pgmcli install
+      - name: Apply migrations
+        run: npx pgmcli apply
+      - name: Revert migrations
+        run: npx pgmcli revert --until $(ls -1 migrations | head -n 1)
+```
