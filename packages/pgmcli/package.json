@@ -23,8 +23,7 @@
   },
   "bin": "dist/pgmcli.js",
   "files": [
-    "dist",
-    "schema.json"
+    "dist"
   ],
   "engines": {
     "node": ">=18"
