@@ -3,7 +3,7 @@
   "description": "A command-line tool to manage Postgres migrations",
   "author": "7078731+igrek8@users.noreply.github.com",
   "license": "MIT",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "type": "module",
   "homepage": "https://igrek8.github.io/monorepo/packages/pgmcli",
   "keywords": [
