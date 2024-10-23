@@ -1,7 +1,6 @@
 {
   "name": "docs",
   "version": "0.0.0",
-  "description": "Documentation for monorepo",
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
@@ -30,8 +29,7 @@
     "@docusaurus/tsconfig": "3.5.2",
     "@docusaurus/types": "3.5.2",
     "raw-loader": "4.0.2",
-    "typescript": "5.4.5",
-    "@types/node": "22"
+    "typescript": "5.4.5"
   },
   "browserslist": {
     "production": [

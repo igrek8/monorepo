@@ -1,5 +1,5 @@
 import type { ClientConfig } from 'pg';
-import type { LogLevel } from './logging.js';
+import type { LogLevel } from './logging';
 
 export interface Config {
   $schema?: string;

@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { describe, expect, it } from 'vitest';
-import { attachDefaultOptions } from './attach-default-options.js';
-import type { Config } from './config.interface.js';
+import { attachDefaultOptions } from './attachDefaultOptions';
+import type { Config } from './Config';
 
 describe('attachDefaultOptions', () => {
   it('uses default options', () => {

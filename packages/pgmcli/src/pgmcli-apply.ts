@@ -2,13 +2,13 @@
 
 import { Option, program } from 'commander';
 
-import { type ApplyOptions, apply } from './actions/apply.js';
-import { attachDefaultOptions } from './core/attach-default-options.js';
-import { DEFAULT_LOG_LEVEL, DEFAULT_TAG } from './core/constants.js';
-import { LogLevel } from './core/logging.js';
-import { resolveConfig } from './core/resolve-config.js';
+import { type ApplyOptions, apply } from './actions/apply';
+import { attachDefaultOptions } from './core/attachDefaultOptions';
+import { DEFAULT_LOG_LEVEL, DEFAULT_TAG } from './core/constants';
+import { LogLevel } from './core/logging';
+import { resolveConfigSync } from './core/resolveConfigSync';
 
-const config = await resolveConfig(process.argv);
+const config = resolveConfigSync(process.argv);
 
 const logLevel = new Option('--log-level <level>', 'log level')
   .choices(Object.keys(LogLevel))

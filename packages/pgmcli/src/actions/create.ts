@@ -1,5 +1,5 @@
-import assert from 'assert/strict';
-import { mkdir, writeFile } from 'fs/promises';
+import { strict as assert } from 'assert/strict';
+import { mkdirSync, writeFileSync } from 'fs';
 import { basename, dirname, extname, join } from 'path';
 
 const TS = `import type { Client } from "pg";
@@ -78,7 +78,7 @@ export interface CreateOptions {
 
 const extensions = Object.keys(templates).join(', ');
 
-export async function create(options: CreateOptions, console = globalThis.console) {
+export function create(options: CreateOptions, console = globalThis.console) {
   const fileExtension = extname(options.name);
   const fileName = basename(options.name, fileExtension);
   const fileContent = templates[fileExtension]?.replace('<revert_tag>', options.tag);
@@ -86,7 +86,7 @@ export async function create(options: CreateOptions, console = globalThis.consol
   const timestamp = Date.now();
   const outputFileName = `${timestamp}_${fileName}${fileExtension}`;
   const outputFilePath = join(options.dir, outputFileName);
-  await mkdir(dirname(outputFilePath), { recursive: true });
-  if (!options.plan) await writeFile(outputFilePath, fileContent);
+  mkdirSync(dirname(outputFilePath), { recursive: true });
+  if (!options.plan) writeFileSync(outputFilePath, fileContent);
   console.info(`created: ${outputFilePath}`);
 }

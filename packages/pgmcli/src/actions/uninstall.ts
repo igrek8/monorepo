@@ -1,12 +1,11 @@
-import pg from 'pg';
-
-import type { Config } from '../core/config.interface.js';
-import type { DefaultCommandOptions } from '../core/default-command-options.interface.js';
+import { Client } from 'pg';
+import type { Config } from '../core/Config';
+import type { DefaultCommandOptions } from '../core/DefaultCommandOptions';
 
 export type UninstallOptions = DefaultCommandOptions;
 
 export async function uninstall(options: UninstallOptions, config?: Config) {
-  const client = new pg.Client({
+  const client = new Client({
     ...config?.client,
     host: options.host,
     port: options.port,
@@ -14,9 +13,9 @@ export async function uninstall(options: UninstallOptions, config?: Config) {
     password: options.password,
     database: options.db,
   });
+  const table = client.escapeIdentifier(options.table);
   try {
     await client.connect();
-    const table = client.escapeIdentifier(options.table);
     await client.query(`DROP TABLE ${table}`);
   } finally {
     await client.end();

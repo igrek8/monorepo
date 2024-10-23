@@ -1,15 +1,14 @@
 import { resolve } from 'path';
-import pg from 'pg';
-
-import type { Config } from '../core/config.interface.js';
-import type { DefaultCommandOptions } from '../core/default-command-options.interface.js';
-import { getAppliedMigrations } from '../core/get-applied-migrations.js';
-import { getMigrations } from '../core/get-migrations.js';
+import { Client } from 'pg';
+import type { Config } from '../core/Config';
+import type { DefaultCommandOptions } from '../core/DefaultCommandOptions';
+import { getAppliedMigrations } from '../core/getAppliedMigrations';
+import { getMigrations } from '../core/getMigrations';
 
 export type StatusOptions = DefaultCommandOptions;
 
 export async function status(options: StatusOptions, config?: Config, console = globalThis.console) {
-  const client = new pg.Client({
+  const client = new Client({
     ...config?.client,
     host: options.host,
     port: options.port,

@@ -1,7 +1,7 @@
 import type { Command } from 'commander';
 
-import type { Config } from './config.interface.js';
-import { DEFAULT_CONFIG_PATH, DEFAULT_DIR, DEFAULT_TABLE } from './constants.js';
+import type { Config } from './Config';
+import { DEFAULT_CONFIG_PATH, DEFAULT_DIR, DEFAULT_TABLE } from './constants';
 
 export function attachDefaultOptions(cmd: Command, config?: Config) {
   return cmd

@@ -1,11 +1,15 @@
 #!/usr/bin/env node
 
 import { program } from 'commander';
+import * as path from 'path';
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { name, version, description } = require(path.join(__dirname, '..', 'package.json'));
 
 program
-  .name('pgmcli')
-  .version(process.env.npm_package_version ?? '0.0.0')
-  .description('A command-line tool to manage Postgres migrations')
+  .name(name)
+  .version(version)
+  .description(description)
   .command('install', 'create migrations table')
   .command('uninstall', 'drop migrations table')
   .command('status', 'show status')

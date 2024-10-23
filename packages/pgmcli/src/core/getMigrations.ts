@@ -1,11 +1,11 @@
-import assert from 'assert/strict';
-import { readdir } from 'fs/promises';
-import type { Migration } from './migration.interface.js';
-import { sort } from './sort.js';
+import { strict as assert } from 'assert/strict';
+import { readdirSync } from 'fs';
+import type { Migration } from './Migration';
+import { sort } from './sort';
 
-export async function getMigrations(migrationsDir: string) {
+export function getMigrations(migrationsDir: string) {
   return new Map<string, Migration>(
-    (await readdir(migrationsDir, { withFileTypes: true }))
+    readdirSync(migrationsDir, { withFileTypes: true })
       .reduce<[string, Migration][]>((arr, entry) => {
         if (entry.isFile()) {
           const created_at = Number.parseInt(entry.name);

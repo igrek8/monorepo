@@ -4,7 +4,6 @@
   "license": "MIT",
   "private": true,
   "packageManager": "pnpm@9.10.0",
-  "type": "module",
   "scripts": {
     "format": "prettier . --check",
     "lint": "eslint",

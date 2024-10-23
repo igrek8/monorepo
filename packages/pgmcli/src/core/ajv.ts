@@ -1,6 +1,7 @@
 import Ajv from 'ajv';
-import schema from './schema.json' with { type: 'json' };
+import * as path from 'path';
 
-export const ajv = new Ajv.default({ strict: true });
+export const ajv = new Ajv({ strict: true });
 
-ajv.addSchema(schema, '#');
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+ajv.addSchema(require(path.join(__dirname, '..', '..', 'schema.json')), '#');

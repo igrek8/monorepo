@@ -2,11 +2,11 @@
 
 import { program } from 'commander';
 
-import { status, type StatusOptions } from './actions/status.js';
-import { attachDefaultOptions } from './core/attach-default-options.js';
-import { resolveConfig } from './core/resolve-config.js';
+import { status, type StatusOptions } from './actions/status';
+import { attachDefaultOptions } from './core/attachDefaultOptions';
+import { resolveConfigSync } from './core/resolveConfigSync';
 
-const config = await resolveConfig(process.argv);
+const config = resolveConfigSync(process.argv);
 
 attachDefaultOptions(program, config)
   .description('Shows migrations statuses')

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import type { Migration } from './migration.interface.js';
-import { sort } from './sort.js';
+import type { Migration } from './Migration';
+import { sort } from './sort';
 
 describe('sort', () => {
   it('sorts by id', () => {

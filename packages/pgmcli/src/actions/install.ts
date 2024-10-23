@@ -1,8 +1,7 @@
-import { mkdir } from 'fs/promises';
-import pg from 'pg';
-
-import type { Config } from '../core/config.interface.js';
-import type { DefaultCommandOptions } from '../core/default-command-options.interface.js';
+import { mkdirSync } from 'fs';
+import { Client } from 'pg';
+import type { Config } from '../core/Config';
+import type { DefaultCommandOptions } from '../core/DefaultCommandOptions';
 
 export type InstallOptions = DefaultCommandOptions;
 
@@ -14,7 +13,7 @@ const sql = `CREATE TABLE <table> (
 `;
 
 export async function install(options: InstallOptions, config?: Config) {
-  const client = new pg.Client({
+  const client = new Client({
     ...config?.client,
     host: options.host,
     port: options.port,
@@ -26,7 +25,7 @@ export async function install(options: InstallOptions, config?: Config) {
   try {
     await client.connect();
     await client.query(sql.replace('<table>', table));
-    await mkdir(options.dir, { recursive: true });
+    mkdirSync(options.dir, { recursive: true });
   } finally {
     await client.end();
   }

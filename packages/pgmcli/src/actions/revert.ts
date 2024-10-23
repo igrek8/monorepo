@@ -1,13 +1,12 @@
-import { readFile } from 'fs/promises';
+import { readFileSync } from 'fs';
 import { resolve } from 'path';
-import pg from 'pg';
-
-import { checkIntegrity } from '../core/check-integrity.js';
-import type { Config } from '../core/config.interface.js';
-import type { DefaultCommandOptions } from '../core/default-command-options.interface.js';
-import { getAppliedMigrations } from '../core/get-applied-migrations.js';
-import { getMigrations } from '../core/get-migrations.js';
-import { LogLevel, getConsoleLevel, toServerSeverity } from '../core/logging.js';
+import { Client } from 'pg';
+import { checkIntegrity } from '../core/checkIntegrity';
+import type { Config } from '../core/Config';
+import type { DefaultCommandOptions } from '../core/DefaultCommandOptions';
+import { getAppliedMigrations } from '../core/getAppliedMigrations';
+import { getMigrations } from '../core/getMigrations';
+import { LogLevel, getConsoleLevel, toServerSeverity } from '../core/logging';
 
 export interface RevertOptions extends DefaultCommandOptions {
   plan?: boolean;
@@ -18,7 +17,7 @@ export interface RevertOptions extends DefaultCommandOptions {
 }
 
 export async function revert(options: RevertOptions, config?: Config, console = globalThis.console) {
-  const db = new pg.Client({
+  const db = new Client({
     ...config?.client,
     host: options.host,
     port: options.port,
@@ -37,10 +36,8 @@ export async function revert(options: RevertOptions, config?: Config, console = 
     await db.query('BEGIN');
     await db.query(`SET client_min_messages TO ${severity}`);
     await db.query(`LOCK TABLE ${table} IN ACCESS EXCLUSIVE MODE`);
-    const [migrations, applied] = await Promise.all([
-      getMigrations(resolve(options.dir)),
-      getAppliedMigrations(db, table),
-    ]);
+    const migrations = getMigrations(resolve(options.dir));
+    const applied = await getAppliedMigrations(db, table);
     checkIntegrity(migrations, applied);
     if (!migrations.has(options.until)) {
       throw new Error(`Migration ${options.until} not found`);
@@ -56,7 +53,7 @@ export async function revert(options: RevertOptions, config?: Config, console = 
       if (!options.plan) {
         const filePath = resolve(options.dir, migration.id);
         if (migration.id.endsWith('.sql')) {
-          const content = await readFile(filePath, { encoding: 'utf-8' });
+          const content = readFileSync(filePath, { encoding: 'utf-8' });
           const [, down] = content.split(options.tag);
           if (down) {
             await db.query(down);

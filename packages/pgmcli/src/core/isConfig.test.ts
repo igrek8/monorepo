@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { isConfig } from './is-config.js';
+import { isConfig } from './isConfig';
 
-describe('isValidConfig', () => {
+describe('isConfig', () => {
   it('returns true', () => {
     expect(isConfig({ db: 'db' })).toBe(true);
   });

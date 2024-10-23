@@ -1,5 +1,5 @@
-import { ajv } from './ajv.js';
-import type { Config } from './config.interface.js';
+import { ajv } from './ajv';
+import type { Config } from './Config';
 
 export function isConfig(config: unknown): config is Config {
   return ajv.validate('#', config);

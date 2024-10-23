@@ -1,13 +1,12 @@
 import { readFile } from 'fs/promises';
 import { resolve } from 'path';
-import pg from 'pg';
-
-import { checkIntegrity } from '../core/check-integrity.js';
-import { Config } from '../core/config.interface.js';
-import { DefaultCommandOptions } from '../core/default-command-options.interface.js';
-import { getAppliedMigrations } from '../core/get-applied-migrations.js';
-import { getMigrations } from '../core/get-migrations.js';
-import { LogLevel, getConsoleLevel, toServerSeverity } from '../core/logging.js';
+import { Client } from 'pg';
+import { checkIntegrity } from '../core/checkIntegrity';
+import { Config } from '../core/Config';
+import { DefaultCommandOptions } from '../core/DefaultCommandOptions';
+import { getAppliedMigrations } from '../core/getAppliedMigrations';
+import { getMigrations } from '../core/getMigrations';
+import { LogLevel, getConsoleLevel, toServerSeverity } from '../core/logging';
 
 export interface ApplyOptions extends DefaultCommandOptions {
   plan?: boolean;
@@ -18,7 +17,7 @@ export interface ApplyOptions extends DefaultCommandOptions {
 }
 
 export async function apply(options: ApplyOptions, config?: Config, console = globalThis.console) {
-  const db = new pg.Client({
+  const db = new Client({
     ...config?.client,
     host: options.host,
     port: options.port,
@@ -37,10 +36,8 @@ export async function apply(options: ApplyOptions, config?: Config, console = gl
     await db.query('BEGIN');
     await db.query(`SET client_min_messages TO ${severity}`);
     await db.query(`LOCK TABLE ${table} IN ACCESS EXCLUSIVE MODE`);
-    const [migrations, applied] = await Promise.all([
-      getMigrations(resolve(options.dir)),
-      getAppliedMigrations(db, table),
-    ]);
+    const migrations = getMigrations(resolve(options.dir));
+    const applied = await getAppliedMigrations(db, table);
     checkIntegrity(migrations, applied);
     if (options.until) {
       if (!migrations.has(options.until)) {

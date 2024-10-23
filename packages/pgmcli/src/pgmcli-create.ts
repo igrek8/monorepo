@@ -2,13 +2,13 @@
 
 import { program } from 'commander';
 
-import { create, templates, type CreateOptions } from './actions/create.js';
-import { DEFAULT_DIR, DEFAULT_TAG } from './core/constants.js';
-import { resolveConfig } from './core/resolve-config.js';
+import { create, templates, type CreateOptions } from './actions/create';
+import { DEFAULT_DIR, DEFAULT_TAG } from './core/constants';
+import { resolveConfigSync } from './core/resolveConfigSync';
 
 const extensions = Object.keys(templates).join(', ');
 
-const config = await resolveConfig(process.argv);
+const config = resolveConfigSync(process.argv);
 
 program
   .description('Creates a migration file')

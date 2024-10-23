@@ -11,9 +11,9 @@ import { install } from '../src/actions/install';
 import { revert } from '../src/actions/revert';
 import { status } from '../src/actions/status';
 import { uninstall } from '../src/actions/uninstall';
-import type { Config } from '../src/core/config.interface';
-import { DEFAULT_HOST, DEFAULT_PORT, DEFAULT_TAG } from '../src/core/constants';
-import type { DefaultCommandOptions } from '../src/core/default-command-options.interface';
+import type { Config } from '../src/core/Config';
+import { DEFAULT_TAG } from '../src/core/constants';
+import type { DefaultCommandOptions } from '../src/core/DefaultCommandOptions';
 import { LogLevel } from '../src/core/logging';
 
 async function getFileContent(path: PathLike) {
@@ -26,8 +26,8 @@ const logger = new console.Console(stdout, stderr);
 const info = vi.spyOn(logger, 'info');
 
 const options: DefaultCommandOptions = {
-  host: process.env.POSTGRES_HOST ?? DEFAULT_HOST,
-  port: Number(process.env.POSTGRES_PORT ?? DEFAULT_PORT),
+  host: process.env.POSTGRES_HOST,
+  port: Number(process.env.POSTGRES_PORT),
   user: 'postgres',
   table: 'migrations',
   dir: path.join(__dirname, '..', 'migrations'),
@@ -267,7 +267,7 @@ describe.sequential('pgmcli', () => {
       const outDir = tmpdir();
       const outFile = path.join(outDir, '1704067200000_add_new_table.sql');
       vi.setSystemTime('2024-01-01T00:00:00Z');
-      await create({ dir: outDir, name: 'add_new_table.sql', tag: DEFAULT_TAG }, logger);
+      create({ dir: outDir, name: 'add_new_table.sql', tag: DEFAULT_TAG }, logger);
       await expect(getFileContent(outFile)).resolves.toMatchSnapshot();
     });
   });

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getConsoleLevel, LogLevel, ServerSeverity, toServerSeverity } from './logging.js';
+import { getConsoleLevel, LogLevel, ServerSeverity, toServerSeverity } from './logging';
 
 describe('logging', () => {
   describe('getConsoleLevel', () => {

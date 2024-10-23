@@ -12,7 +12,7 @@ You can optionally create a `.pgmcli` file in your project root to store your co
 
 ```json title=".pgmcli"
 {
-  "$schema": "https://raw.githubusercontent.com/igrek8/monorepo/main/packages/pgmcli/src/core/schema.json",
+  "$schema": "https://raw.githubusercontent.com/igrek8/monorepo/main/packages/pgmcli/schema.json",
   "user": "myuser",
   "table": "migration",
   "db": "mydb",
@@ -160,6 +160,7 @@ jobs:
           --health-retries 5
     env:
       POSTGRES_HOST: postgres
+      POSTGRES_USER: postgres
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -168,5 +169,5 @@ jobs:
       - name: Apply migrations
         run: npx pgmcli apply
       - name: Revert migrations
-        run: npx pgmcli revert --until $(ls -1 migrations | head -n 1)
+        run: npx pgmcli revert --until <your_last_migration>
 ```

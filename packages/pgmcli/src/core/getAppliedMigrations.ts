@@ -1,9 +1,9 @@
-import assert from 'assert/strict';
-import pg from 'pg';
-import type { Migration } from './migration.interface.js';
-import { sort } from './sort.js';
+import { strict as assert } from 'assert/strict';
+import type { Client } from 'pg';
+import type { Migration } from './Migration';
+import { sort } from './sort';
 
-export async function getAppliedMigrations(client: pg.Client, table: string) {
+export async function getAppliedMigrations(client: Client, table: string) {
   return new Map<string, Migration>(
     (await client.query<Migration>(`SELECT * FROM ${table}`)).rows
       .map<[string, Migration]>(({ id, meta }) => {

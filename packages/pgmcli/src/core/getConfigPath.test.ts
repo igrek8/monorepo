@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getConfigPath } from './get-config-path.js';
+import { getConfigPath } from './getConfigPath';
 
 describe('getConfigPath', () => {
   it('returns the path to the config file', () => {
