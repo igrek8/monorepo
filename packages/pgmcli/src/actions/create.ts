@@ -78,7 +78,7 @@ export interface CreateOptions {
 
 const extensions = Object.keys(templates).join(', ');
 
-export function create(options: CreateOptions, console = globalThis.console) {
+export function create(options: CreateOptions, console = globalThis.console): void {
   const fileExtension = extname(options.name);
   const fileName = basename(options.name, fileExtension);
   const fileContent = templates[fileExtension]?.replace('<revert_tag>', options.tag);

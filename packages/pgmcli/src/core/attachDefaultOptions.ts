@@ -3,7 +3,7 @@ import type { Command } from 'commander';
 import type { Config } from './Config';
 import { DEFAULT_CONFIG_PATH, DEFAULT_DIR, DEFAULT_TABLE } from './constants';
 
-export function attachDefaultOptions(cmd: Command, config?: Config) {
+export function attachDefaultOptions(cmd: Command, config?: Config): Command {
   return cmd
     .option('--host <string>', 'host', config?.host ?? process.env.POSTGRES_HOST)
     .option('--port <number>', 'port', Number, config?.port ?? process.env.POSTGRES_PORT)

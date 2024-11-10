@@ -16,7 +16,7 @@ export interface ApplyOptions extends DefaultCommandOptions {
   logLevel: LogLevel;
 }
 
-export async function apply(options: ApplyOptions, config?: Config, console = globalThis.console) {
+export async function apply(options: ApplyOptions, config?: Config, console = globalThis.console): Promise<void> {
   const db = new Client({
     ...config?.client,
     host: options.host,

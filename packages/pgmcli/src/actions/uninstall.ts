@@ -4,7 +4,7 @@ import type { DefaultCommandOptions } from '../core/DefaultCommandOptions';
 
 export type UninstallOptions = DefaultCommandOptions;
 
-export async function uninstall(options: UninstallOptions, config?: Config) {
+export async function uninstall(options: UninstallOptions, config?: Config): Promise<void> {
   const client = new Client({
     ...config?.client,
     host: options.host,

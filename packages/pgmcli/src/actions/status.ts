@@ -7,7 +7,7 @@ import { getMigrations } from '../core/getMigrations';
 
 export type StatusOptions = DefaultCommandOptions;
 
-export async function status(options: StatusOptions, config?: Config, console = globalThis.console) {
+export async function status(options: StatusOptions, config?: Config, console = globalThis.console): Promise<void> {
   const client = new Client({
     ...config?.client,
     host: options.host,

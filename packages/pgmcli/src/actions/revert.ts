@@ -16,7 +16,7 @@ export interface RevertOptions extends DefaultCommandOptions {
   logLevel: LogLevel;
 }
 
-export async function revert(options: RevertOptions, config?: Config, console = globalThis.console) {
+export async function revert(options: RevertOptions, config?: Config, console = globalThis.console): Promise<void> {
   const db = new Client({
     ...config?.client,
     host: options.host,
