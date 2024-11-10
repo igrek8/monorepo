@@ -3,7 +3,7 @@ import { readdirSync } from 'fs';
 import type { Migration } from './Migration';
 import { sort } from './sort';
 
-export function getMigrations(migrationsDir: string) {
+export function getMigrations(migrationsDir: string): Map<string, Migration> {
   return new Map<string, Migration>(
     readdirSync(migrationsDir, { withFileTypes: true })
       .reduce<[string, Migration][]>((arr, entry) => {

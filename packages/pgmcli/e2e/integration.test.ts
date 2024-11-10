@@ -16,7 +16,7 @@ import { DEFAULT_TAG } from '../src/core/constants';
 import type { DefaultCommandOptions } from '../src/core/DefaultCommandOptions';
 import { LogLevel } from '../src/core/logging';
 
-async function getFileContent(path: PathLike) {
+async function getFileContent(path: PathLike): Promise<string> {
   return (await fs.readFile(path, 'utf-8')).trim();
 }
 

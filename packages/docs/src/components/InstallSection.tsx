@@ -8,7 +8,7 @@ export interface InstallSectionProps {
   global?: boolean;
 }
 
-export default function InstallSection({ name, global }: InstallSectionProps) {
+export default function InstallSection({ name, global }: InstallSectionProps): JSX.Element {
   return (
     <Tabs>
       <TabItem value="npm" label="npm" default>
