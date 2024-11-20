@@ -16,6 +16,8 @@ export interface ApplyOptions extends DefaultCommandOptions {
   logLevel: LogLevel;
 }
 
+const alwaysApply = ['.always.sql', '.always.js', '.always.ts', '.always.cjs', '.always.mjs', '.always.mts'];
+
 export async function apply(options: ApplyOptions, config?: Config, console = globalThis.console): Promise<void> {
   const db = new Client({
     ...config?.client,
@@ -48,7 +50,7 @@ export async function apply(options: ApplyOptions, config?: Config, console = gl
       }
     }
     for (const migration of migrations.values()) {
-      if (applied.has(migration.id)) {
+      if (applied.has(migration.id) && !alwaysApply.some((ext) => migration.id.endsWith(ext))) {
         continue;
       }
       console.info(`apply: ${migration.id}`);
@@ -65,7 +67,7 @@ export async function apply(options: ApplyOptions, config?: Config, console = gl
           await (mod.up ?? mod.default.up)?.(db, { logLevel: options.logLevel });
         }
         const row = [migration.id, options.meta];
-        await db.query(`INSERT INTO ${table} VALUES ($1, $2)`, row);
+        await db.query(`INSERT INTO ${table} VALUES ($1, $2) ON CONFLICT DO NOTHING`, row);
       }
       if (migration.id === options.until) {
         break;

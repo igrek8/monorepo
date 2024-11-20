@@ -12,8 +12,8 @@ import { revert } from '../src/actions/revert';
 import { status } from '../src/actions/status';
 import { uninstall } from '../src/actions/uninstall';
 import type { Config } from '../src/core/Config';
-import { DEFAULT_TAG } from '../src/core/constants';
 import type { DefaultCommandOptions } from '../src/core/DefaultCommandOptions';
+import { DEFAULT_TAG } from '../src/core/constants';
 import { LogLevel } from '../src/core/logging';
 
 async function getFileContent(path: PathLike): Promise<string> {
@@ -66,6 +66,7 @@ describe.sequential('pgmcli', () => {
     });
     await db.connect();
     await Promise.all(tables.map((table) => db.query(`DROP TABLE IF EXISTS "${table}"`)));
+    await db.query('DROP FUNCTION IF EXISTS add');
   });
 
   afterAll(async () => {
@@ -82,11 +83,12 @@ describe.sequential('pgmcli', () => {
   describe('status', () => {
     it('shows the status of the migrations', async () => {
       await status(options, config, logger);
-      expect(info).toHaveBeenNthCalledWith(1, 'pending: 1_add_customer_table.sql');
-      expect(info).toHaveBeenNthCalledWith(2, 'pending: 2_add_book_table.sql');
-      expect(info).toHaveBeenNthCalledWith(3, 'pending: 3_add_order_table.js');
-      expect(info).toHaveBeenNthCalledWith(4, 'pending: 4_add_order_item_table.sql');
-      expect(info).toHaveBeenNthCalledWith(5, 'pending: 5_add_payment_table.sql');
+      expect(info).toHaveBeenNthCalledWith(1, 'pending: 1_add_add_function.always.sql');
+      expect(info).toHaveBeenNthCalledWith(2, 'pending: 2_add_customer_table.sql');
+      expect(info).toHaveBeenNthCalledWith(3, 'pending: 3_add_book_table.sql');
+      expect(info).toHaveBeenNthCalledWith(4, 'pending: 4_add_order_table.js');
+      expect(info).toHaveBeenNthCalledWith(5, 'pending: 5_add_order_item_table.sql');
+      expect(info).toHaveBeenNthCalledWith(6, 'pending: 6_add_payment_table.sql');
     });
   });
 
@@ -95,7 +97,7 @@ describe.sequential('pgmcli', () => {
       await apply(
         {
           ...options,
-          until: '3_add_order_table.js',
+          until: '4_add_order_table.js',
           tag: DEFAULT_TAG,
           logLevel: LogLevel.INFO,
         },
@@ -111,7 +113,7 @@ describe.sequential('pgmcli', () => {
         {
           ...options,
           tag: DEFAULT_TAG,
-          until: '3_add_order_table.js',
+          until: '4_add_order_table.js',
           logLevel: LogLevel.INFO,
         },
         config,
@@ -138,11 +140,12 @@ describe.sequential('pgmcli', () => {
 
     it('shows the status of the migrations', async () => {
       await status(options, config, logger);
-      expect(info).toHaveBeenNthCalledWith(1, 'applied: 1_add_customer_table.sql');
-      expect(info).toHaveBeenNthCalledWith(2, 'applied: 2_add_book_table.sql');
-      expect(info).toHaveBeenNthCalledWith(3, 'applied: 3_add_order_table.js');
-      expect(info).toHaveBeenNthCalledWith(4, 'pending: 4_add_order_item_table.sql');
-      expect(info).toHaveBeenNthCalledWith(5, 'pending: 5_add_payment_table.sql');
+      expect(info).toHaveBeenNthCalledWith(1, 'applied: 1_add_add_function.always.sql');
+      expect(info).toHaveBeenNthCalledWith(2, 'applied: 2_add_customer_table.sql');
+      expect(info).toHaveBeenNthCalledWith(3, 'applied: 3_add_book_table.sql');
+      expect(info).toHaveBeenNthCalledWith(4, 'applied: 4_add_order_table.js');
+      expect(info).toHaveBeenNthCalledWith(5, 'pending: 5_add_order_item_table.sql');
+      expect(info).toHaveBeenNthCalledWith(6, 'pending: 6_add_payment_table.sql');
     });
 
     it('applies the next 2 migrations', async () => {
@@ -168,11 +171,12 @@ describe.sequential('pgmcli', () => {
 
     it('shows the status of the migrations', async () => {
       await status(options, config, logger);
-      expect(info).toHaveBeenNthCalledWith(1, 'applied: 1_add_customer_table.sql');
-      expect(info).toHaveBeenNthCalledWith(2, 'applied: 2_add_book_table.sql');
-      expect(info).toHaveBeenNthCalledWith(3, 'applied: 3_add_order_table.js');
-      expect(info).toHaveBeenNthCalledWith(4, 'applied: 4_add_order_item_table.sql {\n  "test": true\n}');
-      expect(info).toHaveBeenNthCalledWith(5, 'applied: 5_add_payment_table.sql {\n  "test": true\n}');
+      expect(info).toHaveBeenNthCalledWith(1, 'applied: 1_add_add_function.always.sql');
+      expect(info).toHaveBeenNthCalledWith(2, 'applied: 2_add_customer_table.sql');
+      expect(info).toHaveBeenNthCalledWith(3, 'applied: 3_add_book_table.sql');
+      expect(info).toHaveBeenNthCalledWith(4, 'applied: 4_add_order_table.js');
+      expect(info).toHaveBeenNthCalledWith(5, 'applied: 5_add_order_item_table.sql {\n  "test": true\n}');
+      expect(info).toHaveBeenNthCalledWith(6, 'applied: 6_add_payment_table.sql {\n  "test": true\n}');
     });
   });
 
@@ -181,7 +185,7 @@ describe.sequential('pgmcli', () => {
       await revert(
         {
           ...options,
-          until: '4_add_order_item_table.sql',
+          until: '5_add_order_item_table.sql',
           tag: DEFAULT_TAG,
           logLevel: LogLevel.INFO,
         },
@@ -195,7 +199,7 @@ describe.sequential('pgmcli', () => {
       await revert(
         {
           ...options,
-          until: '4_add_order_item_table.sql',
+          until: '5_add_order_item_table.sql',
           tag: DEFAULT_TAG,
           logLevel: LogLevel.INFO,
         },
@@ -223,18 +227,19 @@ describe.sequential('pgmcli', () => {
 
     it('shows the status of the migrations', async () => {
       await status(options, config, logger);
-      expect(info).toHaveBeenNthCalledWith(1, 'applied: 1_add_customer_table.sql');
-      expect(info).toHaveBeenNthCalledWith(2, 'applied: 2_add_book_table.sql');
-      expect(info).toHaveBeenNthCalledWith(3, 'applied: 3_add_order_table.js');
-      expect(info).toHaveBeenNthCalledWith(4, 'pending: 4_add_order_item_table.sql');
-      expect(info).toHaveBeenNthCalledWith(5, 'pending: 5_add_payment_table.sql');
+      expect(info).toHaveBeenNthCalledWith(1, 'applied: 1_add_add_function.always.sql');
+      expect(info).toHaveBeenNthCalledWith(2, 'applied: 2_add_customer_table.sql');
+      expect(info).toHaveBeenNthCalledWith(3, 'applied: 3_add_book_table.sql');
+      expect(info).toHaveBeenNthCalledWith(4, 'applied: 4_add_order_table.js');
+      expect(info).toHaveBeenNthCalledWith(5, 'pending: 5_add_order_item_table.sql');
+      expect(info).toHaveBeenNthCalledWith(6, 'pending: 6_add_payment_table.sql');
     });
 
     it('reverts the last 3 migrations', async () => {
       await revert(
         {
           ...options,
-          until: '1_add_customer_table.sql',
+          until: '2_add_customer_table.sql',
           tag: DEFAULT_TAG,
           logLevel: LogLevel.INFO,
         },
@@ -247,11 +252,12 @@ describe.sequential('pgmcli', () => {
 
     it('shows the status of the migrations', async () => {
       await status(options, config, logger);
-      expect(info).toHaveBeenNthCalledWith(1, 'pending: 1_add_customer_table.sql');
-      expect(info).toHaveBeenNthCalledWith(2, 'pending: 2_add_book_table.sql');
-      expect(info).toHaveBeenNthCalledWith(3, 'pending: 3_add_order_table.js');
-      expect(info).toHaveBeenNthCalledWith(4, 'pending: 4_add_order_item_table.sql');
-      expect(info).toHaveBeenNthCalledWith(5, 'pending: 5_add_payment_table.sql');
+      expect(info).toHaveBeenNthCalledWith(1, 'applied: 1_add_add_function.always.sql');
+      expect(info).toHaveBeenNthCalledWith(2, 'pending: 2_add_customer_table.sql');
+      expect(info).toHaveBeenNthCalledWith(3, 'pending: 3_add_book_table.sql');
+      expect(info).toHaveBeenNthCalledWith(4, 'pending: 4_add_order_table.js');
+      expect(info).toHaveBeenNthCalledWith(5, 'pending: 5_add_order_item_table.sql');
+      expect(info).toHaveBeenNthCalledWith(6, 'pending: 6_add_payment_table.sql');
     });
   });
 
