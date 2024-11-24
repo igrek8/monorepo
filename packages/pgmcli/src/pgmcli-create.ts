@@ -17,5 +17,6 @@ program
   .requiredOption('--dir <name>', 'migrations directory', config?.dir ?? DEFAULT_DIR)
   .requiredOption('--tag <name>', 'tag where revert block begins', config?.tag ?? DEFAULT_TAG)
   .option('--config <path>', 'config path')
+  // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
   .action((options: CreateOptions) => create(options))
   .parse();

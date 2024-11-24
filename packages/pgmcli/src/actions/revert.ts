@@ -59,8 +59,10 @@ export async function revert(options: RevertOptions, config?: Config, console = 
             await db.query(down);
           }
         } else {
-          const module = await import(filePath);
-          await (module.down ?? module.default.down)?.(db, { logLevel: options.logLevel });
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          const mod = await import(filePath);
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+          await (mod.down ?? mod.default.down)?.(db, { logLevel: options.logLevel });
         }
         await db.query(`DELETE FROM ${table} WHERE id = $1`, [migration.id]);
       }
