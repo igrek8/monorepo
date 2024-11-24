@@ -84,7 +84,7 @@ export function create(options: CreateOptions, console = globalThis.console): vo
   const fileContent = templates[fileExtension]?.replace('<revert_tag>', options.tag);
   assert(fileContent, `Supported extensions ${extensions}`);
   const timestamp = Date.now();
-  const outputFileName = `${timestamp}_${fileName}${fileExtension}`;
+  const outputFileName = `${timestamp.toString()}_${fileName}${fileExtension}`;
   const outputFilePath = join(options.dir, outputFileName);
   mkdirSync(dirname(outputFilePath), { recursive: true });
   if (!options.plan) writeFileSync(outputFilePath, fileContent);

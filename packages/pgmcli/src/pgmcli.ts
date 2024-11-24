@@ -4,7 +4,11 @@ import { program } from 'commander';
 import * as path from 'path';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const { name, version, description } = require(path.join(__dirname, '..', 'package.json'));
+const { name, version, description } = require(path.join(__dirname, '..', 'package.json')) as {
+  name: string;
+  version: string;
+  description: string;
+};
 
 program
   .name(name)

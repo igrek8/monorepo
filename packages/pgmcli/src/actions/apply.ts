@@ -63,7 +63,9 @@ export async function apply(options: ApplyOptions, config?: Config, console = gl
             await db.query(up);
           }
         } else {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           const mod = await import(filePath);
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
           await (mod.up ?? mod.default.up)?.(db, { logLevel: options.logLevel });
         }
         const row = [migration.id, options.meta];

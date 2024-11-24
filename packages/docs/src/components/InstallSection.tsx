@@ -1,14 +1,14 @@
-import React from 'react';
 import CodeBlock from '@theme/CodeBlock';
-import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs';
+import React from 'react';
 
 export interface InstallSectionProps {
   name: string;
   global?: boolean;
 }
 
-export default function InstallSection({ name, global }: InstallSectionProps): JSX.Element {
+export default function InstallSection({ name, global }: InstallSectionProps): React.JSX.Element {
   return (
     <Tabs>
       <TabItem value="npm" label="npm" default>

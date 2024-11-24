@@ -6,5 +6,5 @@ import { readJSONFileSync } from './readJSONFileSync';
 export function readConfigSync(configPath: PathLike): Config {
   const config = readJSONFileSync(configPath);
   if (isConfig(config)) return config;
-  throw new Error(`Invalid config ${configPath}`);
+  throw new Error(`Invalid config ${configPath.toString()}`);
 }
