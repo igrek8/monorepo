@@ -5,26 +5,22 @@ import path from 'path';
 import { Client } from 'pg';
 import { PassThrough } from 'stream';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
-import { apply } from '../src/actions/apply';
-import { create } from '../src/actions/create';
-import { install } from '../src/actions/install';
-import { revert } from '../src/actions/revert';
-import { status } from '../src/actions/status';
-import { uninstall } from '../src/actions/uninstall';
-import type { Config } from '../src/core/Config';
-import type { DefaultCommandOptions } from '../src/core/DefaultCommandOptions';
-import { DEFAULT_TAG } from '../src/core/constants';
-import { LogLevel } from '../src/core/logging';
-import { Console } from 'node:console';
+import { apply } from '../src/actions/apply.js';
+import { create } from '../src/actions/create.js';
+import { install } from '../src/actions/install.js';
+import { revert } from '../src/actions/revert.js';
+import { status } from '../src/actions/status.js';
+import { uninstall } from '../src/actions/uninstall.js';
+import type { Config } from '../src/core/Config.js';
+import type { DefaultCommandOptions } from '../src/core/DefaultCommandOptions.js';
+import { DEFAULT_TAG } from '../src/core/constants.js';
+import { LogLevel } from '../src/types.js';
 
 async function getFileContent(path: PathLike): Promise<string> {
   return (await fs.readFile(path, 'utf-8')).trim();
 }
 
-const stdout = new PassThrough();
-const stderr = new PassThrough();
-const logger = new Console(stdout, stderr);
-const info = vi.spyOn(logger, 'info');
+const info = vi.spyOn(console, 'info');
 
 const options: DefaultCommandOptions = {
   host: process.env.POSTGRES_HOST,
@@ -45,17 +41,17 @@ const tables = ['payment', 'order_item', 'order', 'book', 'customer', 'migration
 async function listTables(db: Client): Promise<string[]> {
   const { rows } = await db.query(
     `
-    SELECT table_name
-    FROM information_schema.tables
-    WHERE table_schema = $1
-    ORDER BY table_name ASC
-  `,
+      SELECT table_name
+      FROM information_schema.tables
+      WHERE table_schema = $1
+      ORDER BY table_name ASC
+    `,
     ['public'],
   );
   return rows.map((row) => row.table_name);
 }
 
-describe.sequential('pgmcli', () => {
+describe('pgmcli', () => {
   let db: Client;
 
   beforeAll(async () => {
@@ -66,7 +62,7 @@ describe.sequential('pgmcli', () => {
       database: options.db,
     });
     await db.connect();
-    await Promise.all(tables.map((table) => db.query(`DROP TABLE IF EXISTS "${table}"`)));
+    for (const t of tables) await db.query(`DROP TABLE IF EXISTS "${t}"`);
     await db.query('DROP FUNCTION IF EXISTS add');
   });
 
@@ -83,13 +79,14 @@ describe.sequential('pgmcli', () => {
 
   describe('status', () => {
     it('shows the status of the migrations', async () => {
-      await status(options, config, logger);
-      expect(info).toHaveBeenNthCalledWith(1, 'pending: 1_add_add_function.always.sql');
+      await status(options, config);
+      expect(info).toHaveBeenNthCalledWith(1, 'pending: 1_add_add_function.sql');
       expect(info).toHaveBeenNthCalledWith(2, 'pending: 2_add_customer_table.sql');
       expect(info).toHaveBeenNthCalledWith(3, 'pending: 3_add_book_table.sql');
-      expect(info).toHaveBeenNthCalledWith(4, 'pending: 4_add_order_table.js');
+      expect(info).toHaveBeenNthCalledWith(4, 'pending: 4_add_order_table.ts');
       expect(info).toHaveBeenNthCalledWith(5, 'pending: 5_add_order_item_table.sql');
       expect(info).toHaveBeenNthCalledWith(6, 'pending: 6_add_payment_table.sql');
+      expect(info).toHaveBeenNthCalledWith(7, 'pending: 7_add_index.ts');
     });
   });
 
@@ -98,12 +95,11 @@ describe.sequential('pgmcli', () => {
       await apply(
         {
           ...options,
-          until: '4_add_order_table.js',
+          until: '4_add_order_table.ts',
           tag: DEFAULT_TAG,
           logLevel: LogLevel.INFO,
         },
         config,
-        logger,
       );
       await expect(listTables(db)).resolves.toStrictEqual(['book', 'customer', 'migrations', 'order']);
       expect(info).toHaveBeenCalledWith('Creating table book');
@@ -114,11 +110,10 @@ describe.sequential('pgmcli', () => {
         {
           ...options,
           tag: DEFAULT_TAG,
-          until: '4_add_order_table.js',
+          until: '4_add_order_table.ts',
           logLevel: LogLevel.INFO,
         },
         config,
-        logger,
       );
       await expect(listTables(db)).resolves.toStrictEqual(['book', 'customer', 'migrations', 'order']);
       expect(info).not.toHaveBeenCalled();
@@ -134,22 +129,21 @@ describe.sequential('pgmcli', () => {
             logLevel: LogLevel.INFO,
           },
           config,
-          logger,
         ),
       ).rejects.toThrow('Migration 6_add_payment_term_table.sql not found');
     });
 
     it('shows the status of the migrations', async () => {
-      await status(options, config, logger);
-      expect(info).toHaveBeenNthCalledWith(1, 'applied: 1_add_add_function.always.sql');
+      await status(options, config);
+      expect(info).toHaveBeenNthCalledWith(1, 'applied: 1_add_add_function.sql');
       expect(info).toHaveBeenNthCalledWith(2, 'applied: 2_add_customer_table.sql');
       expect(info).toHaveBeenNthCalledWith(3, 'applied: 3_add_book_table.sql');
-      expect(info).toHaveBeenNthCalledWith(4, 'applied: 4_add_order_table.js');
+      expect(info).toHaveBeenNthCalledWith(4, 'applied: 4_add_order_table.ts');
       expect(info).toHaveBeenNthCalledWith(5, 'pending: 5_add_order_item_table.sql');
       expect(info).toHaveBeenNthCalledWith(6, 'pending: 6_add_payment_table.sql');
     });
 
-    it('applies the next 2 migrations', async () => {
+    it('applies the next 3 migrations', async () => {
       await apply(
         {
           ...options,
@@ -158,7 +152,6 @@ describe.sequential('pgmcli', () => {
           meta: '{ "test": true }',
         },
         config,
-        logger,
       );
       await expect(listTables(db)).resolves.toStrictEqual([
         'book',
@@ -171,13 +164,14 @@ describe.sequential('pgmcli', () => {
     });
 
     it('shows the status of the migrations', async () => {
-      await status(options, config, logger);
-      expect(info).toHaveBeenNthCalledWith(1, 'applied: 1_add_add_function.always.sql');
+      await status(options, config);
+      expect(info).toHaveBeenNthCalledWith(1, 'applied: 1_add_add_function.sql');
       expect(info).toHaveBeenNthCalledWith(2, 'applied: 2_add_customer_table.sql');
       expect(info).toHaveBeenNthCalledWith(3, 'applied: 3_add_book_table.sql');
-      expect(info).toHaveBeenNthCalledWith(4, 'applied: 4_add_order_table.js');
+      expect(info).toHaveBeenNthCalledWith(4, 'applied: 4_add_order_table.ts');
       expect(info).toHaveBeenNthCalledWith(5, 'applied: 5_add_order_item_table.sql {\n  "test": true\n}');
       expect(info).toHaveBeenNthCalledWith(6, 'applied: 6_add_payment_table.sql {\n  "test": true\n}');
+      expect(info).toHaveBeenNthCalledWith(7, 'applied: 7_add_index.ts {\n  "test": true\n}');
     });
   });
 
@@ -191,7 +185,6 @@ describe.sequential('pgmcli', () => {
           logLevel: LogLevel.INFO,
         },
         config,
-        logger,
       );
       await expect(listTables(db)).resolves.toStrictEqual(['book', 'customer', 'migrations', 'order']);
     });
@@ -205,7 +198,6 @@ describe.sequential('pgmcli', () => {
           logLevel: LogLevel.INFO,
         },
         config,
-        logger,
       );
       await expect(listTables(db)).resolves.toStrictEqual(['book', 'customer', 'migrations', 'order']);
       expect(info).not.toHaveBeenCalled();
@@ -221,17 +213,16 @@ describe.sequential('pgmcli', () => {
             logLevel: LogLevel.INFO,
           },
           config,
-          logger,
         ),
       ).rejects.toThrow('Migration 6_add_payment_term_table.sql not found');
     });
 
     it('shows the status of the migrations', async () => {
-      await status(options, config, logger);
-      expect(info).toHaveBeenNthCalledWith(1, 'applied: 1_add_add_function.always.sql');
+      await status(options, config);
+      expect(info).toHaveBeenNthCalledWith(1, 'applied: 1_add_add_function.sql');
       expect(info).toHaveBeenNthCalledWith(2, 'applied: 2_add_customer_table.sql');
       expect(info).toHaveBeenNthCalledWith(3, 'applied: 3_add_book_table.sql');
-      expect(info).toHaveBeenNthCalledWith(4, 'applied: 4_add_order_table.js');
+      expect(info).toHaveBeenNthCalledWith(4, 'applied: 4_add_order_table.ts');
       expect(info).toHaveBeenNthCalledWith(5, 'pending: 5_add_order_item_table.sql');
       expect(info).toHaveBeenNthCalledWith(6, 'pending: 6_add_payment_table.sql');
     });
@@ -245,18 +236,17 @@ describe.sequential('pgmcli', () => {
           logLevel: LogLevel.INFO,
         },
         config,
-        logger,
       );
       await expect(listTables(db)).resolves.toStrictEqual(['migrations']);
       expect(info).toHaveBeenCalledWith('Dropping table book');
     });
 
     it('shows the status of the migrations', async () => {
-      await status(options, config, logger);
-      expect(info).toHaveBeenNthCalledWith(1, 'applied: 1_add_add_function.always.sql');
+      await status(options, config);
+      expect(info).toHaveBeenNthCalledWith(1, 'applied: 1_add_add_function.sql');
       expect(info).toHaveBeenNthCalledWith(2, 'pending: 2_add_customer_table.sql');
       expect(info).toHaveBeenNthCalledWith(3, 'pending: 3_add_book_table.sql');
-      expect(info).toHaveBeenNthCalledWith(4, 'pending: 4_add_order_table.js');
+      expect(info).toHaveBeenNthCalledWith(4, 'pending: 4_add_order_table.ts');
       expect(info).toHaveBeenNthCalledWith(5, 'pending: 5_add_order_item_table.sql');
       expect(info).toHaveBeenNthCalledWith(6, 'pending: 6_add_payment_table.sql');
     });
@@ -274,7 +264,7 @@ describe.sequential('pgmcli', () => {
       const outDir = tmpdir();
       const outFile = path.join(outDir, '1704067200000_add_new_table.sql');
       vi.setSystemTime('2024-01-01T00:00:00Z');
-      create({ dir: outDir, name: 'add_new_table.sql', tag: DEFAULT_TAG }, logger);
+      create({ dir: outDir, name: 'add_new_table.sql', tag: DEFAULT_TAG });
       await expect(getFileContent(outFile)).resolves.toMatchSnapshot();
     });
   });

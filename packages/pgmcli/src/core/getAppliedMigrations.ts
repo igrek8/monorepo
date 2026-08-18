@@ -1,7 +1,7 @@
 import { strict as assert } from 'assert/strict';
 import type { Client } from 'pg';
-import type { Migration } from './Migration';
-import { sort } from './sort';
+import type { Migration } from './Migration.js';
+import { sort } from './sort.js';
 
 export async function getAppliedMigrations(client: Client, table: string): Promise<Map<string, Migration>> {
   return new Map<string, Migration>(

@@ -1,23 +1,27 @@
-import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { Client } from 'pg';
-import { checkIntegrity } from '../core/checkIntegrity';
-import type { Config } from '../core/Config';
-import type { DefaultCommandOptions } from '../core/DefaultCommandOptions';
-import { getAppliedMigrations } from '../core/getAppliedMigrations';
-import { getMigrations } from '../core/getMigrations';
-import { LogLevel, getConsoleLevel, toServerSeverity } from '../core/logging';
+import { checkIntegrity } from '../core/checkIntegrity.js';
+import type { Config } from '../core/Config.js';
+import type { DefaultCommandOptions } from '../core/DefaultCommandOptions.js';
+import { getAppliedMigrations } from '../core/getAppliedMigrations.js';
+import { getMigrations } from '../core/getMigrations.js';
+import { getConsoleLevel, toServerSeverity } from '../core/logging.js';
+import type { QueryExecutor, LogLevel } from '../types.js';
+import type { NoticeMessage } from 'pg-protocol/dist/messages';
+import { readFile } from 'fs/promises';
+import { parseParams } from '../core/parseParams.js';
+import type { DynamicModule } from '../core/DynamicModule.js';
 
 export interface RevertOptions extends DefaultCommandOptions {
-  plan?: boolean;
-  until: string;
-  meta?: string;
-  tag: string;
-  logLevel: LogLevel;
+  readonly plan?: boolean;
+  readonly until: string;
+  readonly meta?: string;
+  readonly tag: string;
+  readonly logLevel: LogLevel;
 }
 
-export async function revert(options: RevertOptions, config?: Config, console = globalThis.console): Promise<void> {
-  const db = new Client({
+function createClient(options: RevertOptions, config?: Config): Client {
+  return new Client({
     ...config?.client,
     host: options.host,
     port: options.port,
@@ -25,56 +29,85 @@ export async function revert(options: RevertOptions, config?: Config, console = 
     password: options.password,
     database: options.db,
   });
-  db.on('notice', ({ severity, message }) => {
-    const level = getConsoleLevel(severity);
-    console[level](message);
-  });
-  const table = db.escapeIdentifier(options.table);
+}
+
+function onNotice({ severity, message }: NoticeMessage): void {
+  const level = getConsoleLevel(severity);
+  console[level](message);
+}
+
+export async function revert(options: RevertOptions, config?: Config): Promise<void> {
+  const manager = createClient(options, config);
+  manager.on('notice', onNotice);
+  const table = manager.escapeIdentifier(options.table);
   const severity = toServerSeverity(options.logLevel);
+  const migrations = getMigrations(resolve(options.dir));
   try {
-    await db.connect();
-    await db.query('BEGIN');
-    await db.query(`SET client_min_messages TO ${severity}`);
-    await db.query(`LOCK TABLE ${table} IN ACCESS EXCLUSIVE MODE`);
-    const migrations = getMigrations(resolve(options.dir));
-    const applied = await getAppliedMigrations(db, table);
-    checkIntegrity(migrations, applied);
-    if (!migrations.has(options.until)) {
-      throw new Error(`Migration ${options.until} not found`);
-    }
-    if (!applied.has(options.until)) {
-      return;
-    }
-    for (const migration of Array.from(migrations.values()).reverse()) {
-      if (!applied.has(migration.id)) {
-        continue;
-      }
-      console.info(`revert: ${migration.id}`);
-      if (!options.plan) {
-        const filePath = resolve(options.dir, migration.id);
-        if (migration.id.endsWith('.sql')) {
-          const content = readFileSync(filePath, { encoding: 'utf-8' });
-          const [, down] = content.split(options.tag);
-          if (down) {
-            await db.query(down);
-          }
-        } else {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          const mod = await import(filePath);
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-          await (mod.down ?? mod.default.down)?.(db, { logLevel: options.logLevel });
+    await manager.connect();
+    for (const { id } of Array.from(migrations.values()).reverse()) {
+      try {
+        await manager.query('BEGIN');
+        await manager.query(`SET client_min_messages TO ${severity}`);
+        await manager.query(`LOCK TABLE ${table} IN ACCESS EXCLUSIVE MODE`);
+        const applied = await getAppliedMigrations(manager, table);
+        checkIntegrity(migrations, applied);
+        if (!migrations.has(options.until)) {
+          throw new Error(`Migration ${options.until} not found`);
         }
-        await db.query(`DELETE FROM ${table} WHERE id = $1`, [migration.id]);
-      }
-      if (options.until === migration.id) {
-        break;
+        if (!applied.has(options.until)) {
+          await manager.query('ROLLBACK');
+          return;
+        }
+        const filePath = resolve(options.dir, id);
+        let params: Record<string, string | undefined> | undefined;
+        let queryBody: string | undefined;
+        let queryExecutor: QueryExecutor | undefined;
+        if (id.endsWith('.sql')) {
+          const content = await readFile(filePath, 'utf8');
+          const [, down] = content.split(options.tag);
+          params = parseParams(content);
+          queryBody = down;
+        } else {
+          const { downParams, down } = (await import(filePath)) as DynamicModule;
+          params = downParams;
+          queryExecutor = down;
+        }
+        if (!applied.has(id) && params?.run !== 'always') {
+          await manager.query('ROLLBACK');
+          continue;
+        }
+        console.info(`revert: ${id}`);
+        if (!options.plan) {
+          let connection = manager;
+          try {
+            if (params?.transaction === 'false') {
+              connection = createClient(options, config);
+              connection.on('notice', onNotice);
+              await connection.connect();
+              await connection.query(`SET client_min_messages TO ${severity}`);
+            }
+            if (queryBody) {
+              await connection.query(queryBody);
+            } else if (queryExecutor) {
+              await queryExecutor(connection);
+            }
+          } finally {
+            if (connection !== manager) {
+              await connection.end();
+            }
+          }
+          await manager.query(`DELETE FROM ${table} WHERE id = $1`, [id]);
+        }
+        await manager.query('COMMIT');
+        if (id === options.until) {
+          break;
+        }
+      } catch (e) {
+        await manager.query('ROLLBACK');
+        throw e;
       }
     }
-    await db.query('COMMIT');
-  } catch (e) {
-    await db.query('ROLLBACK');
-    throw e;
   } finally {
-    await db.end();
+    await manager.end();
   }
 }

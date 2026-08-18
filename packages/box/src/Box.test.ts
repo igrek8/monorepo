@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { Box } from './Box';
+import { Box } from './Box.js';
 
 describe('Box', () => {
   test('contains value', () => {

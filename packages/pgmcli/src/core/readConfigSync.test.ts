@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import { isConfig } from './isConfig';
-import { readConfigSync } from './readConfigSync';
-import { readJSONFileSync } from './readJSONFileSync';
+import { isConfig } from './isConfig.js';
+import { readConfigSync } from './readConfigSync.js';
+import { readJSONFileSync } from './readJSONFileSync.js';
 
 vi.mock('./readJSONFileSync');
 vi.mock('./isConfig');

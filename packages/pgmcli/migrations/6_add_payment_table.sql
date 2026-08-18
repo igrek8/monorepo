@@ -1,4 +1,3 @@
-
 CREATE TABLE payment (
   id SERIAL PRIMARY KEY,
   order_id INT REFERENCES "order"(id) ON DELETE CASCADE,

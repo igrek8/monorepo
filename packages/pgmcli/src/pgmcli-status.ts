@@ -2,9 +2,9 @@
 
 import { program } from 'commander';
 
-import { status, type StatusOptions } from './actions/status';
-import { attachDefaultOptions } from './core/attachDefaultOptions';
-import { resolveConfigSync } from './core/resolveConfigSync';
+import { status, type StatusOptions } from './actions/status.js';
+import { attachDefaultOptions } from './core/attachDefaultOptions.js';
+import { resolveConfigSync } from './core/resolveConfigSync.js';
 
 const config = resolveConfigSync(process.argv);
 

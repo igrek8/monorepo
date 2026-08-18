@@ -1,5 +1,7 @@
-import Ajv from 'ajv';
-import * as path from 'path';
+import pkg from 'ajv';
+import path from 'node:path';
+
+const { Ajv } = pkg;
 
 export const ajv = new Ajv({ strict: true });
 

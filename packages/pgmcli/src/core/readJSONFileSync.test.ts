@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import { describe, expect, it, vi } from 'vitest';
-import { readJSONFileSync } from './readJSONFileSync';
+import { readJSONFileSync } from './readJSONFileSync.js';
 
 vi.mock('fs');
 

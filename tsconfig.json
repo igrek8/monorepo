@@ -7,7 +7,8 @@
     "declarationMap": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "module": "commonjs",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "noEmit": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
@@ -26,8 +27,9 @@
     "strictFunctionTypes": true,
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
-    "target": "ESNext",
-    "useUnknownInCatchVariables": true
+    "target": "esnext",
+    "useUnknownInCatchVariables": true,
+    "verbatimModuleSyntax": true
   },
   "exclude": ["node_modules", "dist", "build", ".docusaurus"]
 }

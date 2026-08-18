@@ -4,6 +4,7 @@
   "author": "7078731+igrek8@users.noreply.github.com",
   "license": "MIT",
   "version": "3.1.0",
+  "type": "module",
   "homepage": "https://igrek8.github.io/monorepo/packages/pgmcli",
   "keywords": [
     "postgres",
@@ -26,9 +27,10 @@
     "schema.json"
   ],
   "engines": {
-    "node": ">=18"
+    "node": ">=24"
   },
   "scripts": {
+    "lint": "eslint",
     "watch": "tsc -w",
     "build": "tsc -p tsconfig.build.json",
     "test": "vitest --run",
@@ -41,6 +43,7 @@
     "pg": "^8.23.0"
   },
   "devDependencies": {
+    "pg-protocol": "^1.16.0",
     "@types/pg": "^8.23.1",
     "@vitest/coverage-v8": "^4.1.10",
     "ajv": "^8.12.0",
@@ -49,5 +52,13 @@
     "prettier": "^3.9.6",
     "typescript": "^5.8.3",
     "vitest": "^4.1.10"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    "./schema.json": "./schema.json",
+    "./types": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/types/index.js"
+    }
   }
 }

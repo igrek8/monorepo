@@ -1,4 +1,4 @@
-import { LogLevel } from './logging';
+import { LogLevel } from '../types.js';
 
 export const DEFAULT_CONFIG_PATH = '.pgmcli';
 

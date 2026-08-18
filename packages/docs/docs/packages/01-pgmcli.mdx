@@ -98,13 +98,20 @@ Options:
   -h, --help               display help for command
 ```
 
-#### Always Applied Migrations
+#### Migration Parameters
 
-Use the file extensions `.always.sql`, `.always.js`, `.always.ts`, `.always.cjs`, `.always.mjs`, or `.always.mts` to designate a migration to be always applied regardless if it has already been previously applied. This is especially helpful for maintaining alignment between the schema and database objects like functions and triggers.
+Migration files support parameters specified using special comments to control migration behavior. These parameters are defined at the top of the file using the format `-- @ <key> [value]`.
 
-```sql title="migrations/20220101000000_add_function.always.sql"
--- It is import to use REPLACE so that the function can be updated
--- highlight-next-line
+**Supported Parameters:**
+
+- `run` - Controls when a migration is executed. Set to `always` to apply a migration every time regardless if it has already been previously applied. Useful for maintaining alignment between the schema and database objects like functions and triggers.
+- `transaction` - Controls transaction handling. Set to `false` to run the migration outside of a transaction. Required for operations that cannot run within transactions, such as `CREATE INDEX CONCURRENTLY` or `REINDEX CONCURRENTLY`.
+
+**SQL Example:**
+
+```sql title="migrations/20220101000000_add_function.sql"
+-- @ run always
+-- It is important to use REPLACE so that the function can be updated
 CREATE OR REPLACE FUNCTION add(integer, integer) RETURNS integer
     AS 'SELECT $1 + $2;'
     LANGUAGE SQL
@@ -114,6 +121,24 @@ CREATE OR REPLACE FUNCTION add(integer, integer) RETURNS integer
 -- DO NOT REMOVE - THIS LINE SEPARATES APPLY AND REVERT OPERATIONS. REVERT BEGIN
 
 DROP FUNCTION add(integer, integer);
+```
+
+**JavaScript/TypeScript Example:**
+
+```typescript title="migrations/20220102000000_create_index.ts"
+import { Client } from 'pg';
+
+export const upParams = {
+  transaction: 'false',
+};
+
+export async function up(client: Client): Promise<void> {
+  await client.query('CREATE INDEX CONCURRENTLY idx_users_email ON users(email)');
+}
+
+export async function down(client: Client): Promise<void> {
+  await client.query('DROP INDEX CONCURRENTLY idx_users_email');
+}
 ```
 
 ### Revert Migrations

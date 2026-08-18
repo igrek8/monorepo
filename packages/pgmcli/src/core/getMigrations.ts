@@ -1,7 +1,7 @@
 import { strict as assert } from 'assert/strict';
 import { readdirSync } from 'fs';
-import type { Migration } from './Migration';
-import { sort } from './sort';
+import type { Migration } from './Migration.js';
+import { sort } from './sort.js';
 
 export function getMigrations(migrationsDir: string): Map<string, Migration> {
   return new Map<string, Migration>(

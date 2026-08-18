@@ -1,6 +1,6 @@
 import { strict as assert } from 'assert/strict';
 
-import type { Migration } from './Migration';
+import type { Migration } from './Migration.js';
 
 export function checkIntegrity(migrations: Map<string, Migration>, applied: Map<string, Migration>): void {
   const items = Array.from(migrations.values());

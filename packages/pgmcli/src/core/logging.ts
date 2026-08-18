@@ -1,11 +1,4 @@
-export enum LogLevel {
-  DEBUG = 'DEBUG',
-  LOG = 'LOG',
-  INFO = 'INFO',
-  NOTICE = 'NOTICE',
-  WARNING = 'WARNING',
-  ERROR = 'ERROR',
-}
+import { LogLevel } from '../types.js';
 
 export enum ServerSeverity {
   DEBUG = 'DEBUG',
