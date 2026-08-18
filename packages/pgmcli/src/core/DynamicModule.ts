@@ -1,8 +1,8 @@
-import type { UpFunction, DownFunction } from '../types.js';
+import type { QueryExecutor } from '../types.js';
 
 export interface DynamicModule {
   readonly upParams?: Record<string, string | undefined>;
-  readonly up?: UpFunction;
+  readonly up?: QueryExecutor;
   readonly downParams?: Record<string, string | undefined>;
-  readonly down?: DownFunction;
+  readonly down?: QueryExecutor;
 }

@@ -6,7 +6,7 @@ import type { DefaultCommandOptions } from '../core/DefaultCommandOptions.js';
 import { getAppliedMigrations } from '../core/getAppliedMigrations.js';
 import { getMigrations } from '../core/getMigrations.js';
 import { getConsoleLevel, toServerSeverity } from '../core/logging.js';
-import type { DownFunction, LogLevel } from '../types.js';
+import type { QueryExecutor, LogLevel } from '../types.js';
 import type { NoticeMessage } from 'pg-protocol/dist/messages';
 import { readFile } from 'fs/promises';
 import { parseParams } from '../core/parseParams.js';
@@ -61,7 +61,7 @@ export async function revert(options: RevertOptions, config?: Config): Promise<v
         const filePath = resolve(options.dir, id);
         let params: Record<string, string | undefined> | undefined;
         let queryBody: string | undefined;
-        let queryExecutor: DownFunction | undefined;
+        let queryExecutor: QueryExecutor | undefined;
         if (id.endsWith('.sql')) {
           const content = await readFile(filePath, 'utf8');
           const [, down] = content.split(options.tag);

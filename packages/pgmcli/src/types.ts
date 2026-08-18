@@ -9,6 +9,4 @@ export enum LogLevel {
   ERROR = 'ERROR',
 }
 
-export type UpFunction = (connection: Client) => void | Promise<void>;
-
-export type DownFunction = (connection: Client) => void | Promise<void>;
+export type QueryExecutor = (connection: Client) => void | Promise<void>;

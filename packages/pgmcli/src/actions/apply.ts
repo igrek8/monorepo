@@ -8,7 +8,7 @@ import { getAppliedMigrations } from '../core/getAppliedMigrations.js';
 import { getMigrations } from '../core/getMigrations.js';
 import { getConsoleLevel, toServerSeverity } from '../core/logging.js';
 import type { DynamicModule } from '../core/DynamicModule.js';
-import type { LogLevel, UpFunction } from '../types.js';
+import type { LogLevel, QueryExecutor } from '../types.js';
 import { parseParams } from '../core/parseParams.js';
 import type { NoticeMessage } from 'pg-protocol/dist/messages';
 
@@ -63,7 +63,7 @@ export async function apply(options: ApplyOptions, config?: Config): Promise<voi
         const filePath = resolve(options.dir, id);
         let params: Record<string, string | undefined> | undefined;
         let queryBody: string | undefined;
-        let queryExecutor: UpFunction | undefined;
+        let queryExecutor: QueryExecutor | undefined;
         if (id.endsWith('.sql')) {
           const content = await readFile(filePath, 'utf8');
           const [up] = content.split(options.tag);
