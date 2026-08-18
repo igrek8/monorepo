@@ -1,5 +1,11 @@
 # pgmcli
 
+## 4.0.1
+
+### Patch Changes
+
+- 90212d9: Resolve package metadata and schema.json
+
 ## 4.0.0
 
 ### Major Changes
