@@ -2,6 +2,7 @@
   "name": "box",
   "version": "0.0.0",
   "license": "MIT",
+  "type": "module",
   "author": "7078731+igrek8@users.noreply.github.com",
   "description": "Wraps a value into a box to pass it by reference",
   "keywords": [
