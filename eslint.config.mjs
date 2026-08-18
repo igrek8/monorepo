@@ -1,9 +1,12 @@
 import eslint from '@eslint/js';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+import { defineConfig } from 'eslint/config';
 
-export default tseslint.config(
-  { files: ['**/*.{js,mjs,cjs,ts}'] },
+export default defineConfig(
+  {
+    files: ['**/*.{js,mjs,cjs,ts}'],
+  },
   {
     ignores: [
       '**/dist/',
