@@ -27,7 +27,7 @@
     "schema.json"
   ],
   "engines": {
-    "node": ">=18"
+    "node": ">=24"
   },
   "scripts": {
     "lint": "eslint",
