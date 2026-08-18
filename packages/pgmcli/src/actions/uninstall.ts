@@ -5,7 +5,7 @@ import type { DefaultCommandOptions } from '../core/DefaultCommandOptions.js';
 export type UninstallOptions = DefaultCommandOptions;
 
 export async function uninstall(options: UninstallOptions, config?: Config): Promise<void> {
-  const client = new Client({
+  const manager = new Client({
     ...config?.client,
     host: options.host,
     port: options.port,
@@ -13,11 +13,11 @@ export async function uninstall(options: UninstallOptions, config?: Config): Pro
     password: options.password,
     database: options.db,
   });
-  const table = client.escapeIdentifier(options.table);
+  const table = manager.escapeIdentifier(options.table);
   try {
-    await client.connect();
-    await client.query(`DROP TABLE ${table}`);
+    await manager.connect();
+    await manager.query(`DROP TABLE ${table}`);
   } finally {
-    await client.end();
+    await manager.end();
   }
 }

@@ -58,10 +58,10 @@ export const templates: Record<string, string> = {
 };
 
 export interface CreateOptions {
-  name: string;
-  dir: string;
-  plan?: boolean;
-  tag: string;
+  readonly name: string;
+  readonly dir: string;
+  readonly plan?: boolean;
+  readonly tag: string;
 }
 
 const extensions = Object.keys(templates).join(', ');

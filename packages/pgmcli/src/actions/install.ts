@@ -13,7 +13,7 @@ const sql = `CREATE TABLE <table> (
 `;
 
 export async function install(options: InstallOptions, config?: Config): Promise<void> {
-  const client = new Client({
+  const manager = new Client({
     ...config?.client,
     host: options.host,
     port: options.port,
@@ -21,12 +21,12 @@ export async function install(options: InstallOptions, config?: Config): Promise
     password: options.password,
     database: options.db,
   });
-  const table = client.escapeIdentifier(options.table);
+  const table = manager.escapeIdentifier(options.table);
   try {
-    await client.connect();
-    await client.query(sql.replace('<table>', table));
+    await manager.connect();
+    await manager.query(sql.replace('<table>', table));
     mkdirSync(options.dir, { recursive: true });
   } finally {
-    await client.end();
+    await manager.end();
   }
 }

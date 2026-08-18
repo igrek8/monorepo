@@ -70,7 +70,7 @@ export async function apply(options: ApplyOptions, config?: Config): Promise<voi
           params = parseParams(content);
           queryBody = up;
         } else {
-          const { up, upParams } = (await import(filePath)) as DynamicModule;
+          const { upParams, up } = (await import(filePath)) as DynamicModule;
           params = upParams;
           queryExecutor = up;
         }

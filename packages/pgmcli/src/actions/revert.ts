@@ -68,7 +68,7 @@ export async function revert(options: RevertOptions, config?: Config): Promise<v
           params = parseParams(content);
           queryBody = down;
         } else {
-          const { down, downParams } = (await import(filePath)) as DynamicModule;
+          const { downParams, down } = (await import(filePath)) as DynamicModule;
           params = downParams;
           queryExecutor = down;
         }
