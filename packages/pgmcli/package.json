@@ -55,7 +55,7 @@
   },
   "exports": {
     "./package.json": "./package.json",
-    "./schema.json": "./schema.json",
+    "./schema.json": "./dist/core/schema.json",
     "./types": {
       "types": "./dist/types/index.d.ts",
       "import": "./dist/types/index.js"

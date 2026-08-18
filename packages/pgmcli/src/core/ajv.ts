@@ -1,9 +1,6 @@
-import pkg from 'ajv';
-import path from 'node:path';
+import cjs from 'ajv';
+import schema from './schema.json' with { type: 'json' };
 
-const { Ajv } = pkg;
+export const ajv = new cjs.Ajv({ strict: true });
 
-export const ajv = new Ajv({ strict: true });
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-argument
-ajv.addSchema(require(path.join(__dirname, '..', '..', 'schema.json')), '#');
+ajv.addSchema(schema, '#');

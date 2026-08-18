@@ -2,13 +2,19 @@
 
 import { program } from 'commander';
 import path from 'path';
+import { fileURLToPath } from 'url';
+import { readJSONFileSync } from './core/readJSONFileSync.js';
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const { name, version, description } = require(path.join(__dirname, '..', 'package.json')) as {
-  name: string;
-  version: string;
-  description: string;
-};
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+interface PackageMetadata {
+  readonly name: string;
+  readonly version: string;
+  readonly description: string;
+}
+
+const { name, version, description } = readJSONFileSync<PackageMetadata>(path.join(__dirname, '../package.json'));
 
 program
   .name(name)
