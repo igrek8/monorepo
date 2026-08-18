@@ -1,7 +1,7 @@
 import type { PathLike } from 'fs';
-import type { Config } from './Config';
-import { isConfig } from './isConfig';
-import { readJSONFileSync } from './readJSONFileSync';
+import type { Config } from './Config.js';
+import { isConfig } from './isConfig.js';
+import { readJSONFileSync } from './readJSONFileSync.js';
 
 export function readConfigSync(configPath: PathLike): Config {
   const config = readJSONFileSync(configPath);

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { program } from 'commander';
-import * as path from 'path';
+import path from 'path';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const { name, version, description } = require(path.join(__dirname, '..', 'package.json')) as {

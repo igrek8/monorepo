@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { getConsoleLevel, LogLevel, ServerSeverity, toServerSeverity } from './logging';
+import { getConsoleLevel, ServerSeverity, toServerSeverity } from './logging.js';
+import { LogLevel } from '../types.js';
 
 describe('logging', () => {
   describe('getConsoleLevel', () => {

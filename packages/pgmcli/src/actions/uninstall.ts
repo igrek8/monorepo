@@ -1,6 +1,6 @@
 import { Client } from 'pg';
-import type { Config } from '../core/Config';
-import type { DefaultCommandOptions } from '../core/DefaultCommandOptions';
+import type { Config } from '../core/Config.js';
+import type { DefaultCommandOptions } from '../core/DefaultCommandOptions.js';
 
 export type UninstallOptions = DefaultCommandOptions;
 

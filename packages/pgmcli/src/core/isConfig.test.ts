@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isConfig } from './isConfig';
+import { isConfig } from './isConfig.js';
 
 describe('isConfig', () => {
   it('returns true', () => {

@@ -2,11 +2,11 @@
 
 import { Option, program } from 'commander';
 
-import { revert, type RevertOptions } from './actions/revert';
-import { attachDefaultOptions } from './core/attachDefaultOptions';
-import { DEFAULT_LOG_LEVEL, DEFAULT_TAG } from './core/constants';
-import { LogLevel } from './core/logging';
-import { resolveConfigSync } from './core/resolveConfigSync';
+import { revert, type RevertOptions } from './actions/revert.js';
+import { attachDefaultOptions } from './core/attachDefaultOptions.js';
+import { DEFAULT_LOG_LEVEL, DEFAULT_TAG } from './core/constants.js';
+import { resolveConfigSync } from './core/resolveConfigSync.js';
+import { LogLevel } from './types.js';
 
 const config = resolveConfigSync(process.argv);
 

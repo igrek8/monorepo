@@ -1,25 +1,27 @@
 import { readFile } from 'fs/promises';
 import { resolve } from 'path';
 import { Client } from 'pg';
-import { checkIntegrity } from '../core/checkIntegrity';
-import { Config } from '../core/Config';
-import { DefaultCommandOptions } from '../core/DefaultCommandOptions';
-import { getAppliedMigrations } from '../core/getAppliedMigrations';
-import { getMigrations } from '../core/getMigrations';
-import { LogLevel, getConsoleLevel, toServerSeverity } from '../core/logging';
+import { checkIntegrity } from '../core/checkIntegrity.js';
+import type { Config } from '../core/Config.js';
+import type { DefaultCommandOptions } from '../core/DefaultCommandOptions.js';
+import { getAppliedMigrations } from '../core/getAppliedMigrations.js';
+import { getMigrations } from '../core/getMigrations.js';
+import { getConsoleLevel, toServerSeverity } from '../core/logging.js';
+import type { DynamicModule } from '../core/DynamicModule.js';
+import type { LogLevel, UpFunction } from '../types.js';
+import { parseParams } from '../core/parseParams.js';
+import type { NoticeMessage } from 'pg-protocol/dist/messages';
 
 export interface ApplyOptions extends DefaultCommandOptions {
-  plan?: boolean;
-  until?: string;
-  meta?: string;
-  tag: string;
-  logLevel: LogLevel;
+  readonly plan?: boolean;
+  readonly until?: string;
+  readonly meta?: string;
+  readonly tag: string;
+  readonly logLevel: LogLevel;
 }
 
-const alwaysApply = ['.always.sql', '.always.js', '.always.ts', '.always.cjs', '.always.mjs', '.always.mts'];
-
-export async function apply(options: ApplyOptions, config?: Config, console = globalThis.console): Promise<void> {
-  const db = new Client({
+function createClient(options: ApplyOptions, config?: Config): Client {
+  return new Client({
     ...config?.client,
     host: options.host,
     port: options.port,
@@ -27,59 +29,87 @@ export async function apply(options: ApplyOptions, config?: Config, console = gl
     password: options.password,
     database: options.db,
   });
-  db.on('notice', ({ severity, message }) => {
-    const level = getConsoleLevel(severity);
-    console[level](message);
-  });
-  const table = db.escapeIdentifier(options.table);
+}
+
+function onNotice({ severity, message }: NoticeMessage): void {
+  const level = getConsoleLevel(severity);
+  console[level](message);
+}
+
+export async function apply(options: ApplyOptions, config?: Config): Promise<void> {
+  const manager = createClient(options, config);
+  manager.on('notice', onNotice);
+  const table = manager.escapeIdentifier(options.table);
   const severity = toServerSeverity(options.logLevel);
+  const migrations = getMigrations(resolve(options.dir));
   try {
-    await db.connect();
-    await db.query('BEGIN');
-    await db.query(`SET client_min_messages TO ${severity}`);
-    await db.query(`LOCK TABLE ${table} IN ACCESS EXCLUSIVE MODE`);
-    const migrations = getMigrations(resolve(options.dir));
-    const applied = await getAppliedMigrations(db, table);
-    checkIntegrity(migrations, applied);
-    if (options.until) {
-      if (!migrations.has(options.until)) {
-        throw new Error(`Migration ${options.until} not found`);
-      }
-      if (applied.has(options.until)) {
-        return;
-      }
-    }
-    for (const migration of migrations.values()) {
-      if (applied.has(migration.id) && !alwaysApply.some((ext) => migration.id.endsWith(ext))) {
-        continue;
-      }
-      console.info(`apply: ${migration.id}`);
-      if (!options.plan) {
-        const filePath = resolve(options.dir, migration.id);
-        if (migration.id.endsWith('.sql')) {
-          const content = await readFile(filePath, { encoding: 'utf-8' });
-          const [up] = content.split(options.tag);
-          if (up) {
-            await db.query(up);
+    await manager.connect();
+    for (const { id } of migrations.values()) {
+      try {
+        await manager.query('BEGIN');
+        await manager.query(`SET client_min_messages TO ${severity}`);
+        await manager.query(`LOCK TABLE ${table} IN ACCESS EXCLUSIVE MODE`);
+        const applied = await getAppliedMigrations(manager, table);
+        checkIntegrity(migrations, applied);
+        if (options.until) {
+          if (!migrations.has(options.until)) {
+            throw new Error(`Migration ${options.until} not found`);
           }
-        } else {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          const mod = await import(filePath);
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-          await (mod.up ?? mod.default.up)?.(db, { logLevel: options.logLevel });
+          if (applied.has(options.until)) {
+            await manager.query('ROLLBACK');
+            return;
+          }
         }
-        const row = [migration.id, options.meta];
-        await db.query(`INSERT INTO ${table} VALUES ($1, $2) ON CONFLICT DO NOTHING`, row);
-      }
-      if (migration.id === options.until) {
-        break;
+        const filePath = resolve(options.dir, id);
+        let params: Record<string, string | undefined> | undefined;
+        let queryBody: string | undefined;
+        let queryExecutor: UpFunction | undefined;
+        if (id.endsWith('.sql')) {
+          const content = await readFile(filePath, 'utf8');
+          const [up] = content.split(options.tag);
+          params = parseParams(content);
+          queryBody = up;
+        } else {
+          const { up, upParams } = (await import(filePath)) as DynamicModule;
+          params = upParams;
+          queryExecutor = up;
+        }
+        if (applied.has(id) && params?.run !== 'always') {
+          await manager.query('ROLLBACK');
+          continue;
+        }
+        console.info(`apply: ${id}`);
+        if (!options.plan) {
+          let connection = manager;
+          try {
+            if (params?.transaction === 'false') {
+              connection = createClient(options, config);
+              connection.on('notice', onNotice);
+              await connection.connect();
+              await connection.query(`SET client_min_messages TO ${severity}`);
+            }
+            if (queryBody) {
+              await connection.query(queryBody);
+            } else if (queryExecutor) {
+              await queryExecutor(connection);
+            }
+          } finally {
+            if (connection !== manager) {
+              await connection.end();
+            }
+          }
+          await manager.query(`INSERT INTO ${table} VALUES ($1, $2) ON CONFLICT DO NOTHING`, [id, options.meta]);
+        }
+        await manager.query('COMMIT');
+        if (id === options.until) {
+          break;
+        }
+      } catch (e) {
+        await manager.query('ROLLBACK');
+        throw e;
       }
     }
-    await db.query('COMMIT');
-  } catch (e) {
-    await db.query('ROLLBACK');
-    throw e;
   } finally {
-    await db.end();
+    await manager.end();
   }
 }

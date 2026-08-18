@@ -1,5 +1,5 @@
 export interface Migration {
-  id: string;
-  created_at: number;
-  meta?: Record<string, unknown>;
+  readonly id: string;
+  readonly created_at: number;
+  readonly meta?: Record<string, unknown>;
 }

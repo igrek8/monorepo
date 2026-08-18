@@ -2,47 +2,36 @@ import { strict as assert } from 'assert/strict';
 import { mkdirSync, writeFileSync } from 'fs';
 import { basename, dirname, extname, join } from 'path';
 
-const TS = `import type { Client } from "pg";
+const TS = `import type { Client } from 'pg';
 
-export async function up(db: Client, _: { logLevel: string }) {
+export const upParams: Record<string, string | undefined> = {
+  transaction: 'true'
+};
+
+export async function up(connection: Client): Promise<void> {
   console.log("Applying");
 }
 
-export async function down(db: Client, _: { logLevel: string }) {
+export const downParams: Record<string, string | undefined> = {
+  transaction: 'true'
+};
+
+export async function down(connection: Client): Promise<void> {
   console.log("Reverting");
 }
 `;
 
 const ESM = `/**
- * @param {import('pg').Client} db
- * @param {{ logLevel: string }} options
+ * @param {import('pg').Client} connection
  */
-export async function up(db) {
+export async function up(connection) {
   console.log("Applying");
 }
 
 /**
- * @param {import('pg').Client} db
- * @param {{ logLevel: string }} options
+ * @param {import('pg').Client} connection
  */
-export async function down(db) {
-  console.log("Reverting");
-}
-`;
-
-const CJS = `/**
- * @param {import('pg').Client} db
- * @param {{ logLevel: string }} options
- */
-module.exports.up = async function up(client) {
-  console.log("Applying");
-}
-
-/**
- * @param {import('pg').Client} db
- * @param {{ logLevel: string }} options
- */
-module.exports.down = async function down(client) {
+export async function down(connection) {
   console.log("Reverting");
 }
 `;
@@ -62,8 +51,7 @@ END $$;
 
 export const templates: Record<string, string> = {
   '.ts': TS,
-  '.js': CJS,
-  '.cjs': CJS,
+  '.js': ESM,
   '.mjs': ESM,
   '.mts': TS,
   '.sql': SQL,

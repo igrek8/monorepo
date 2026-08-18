@@ -1,9 +1,9 @@
 import { existsSync } from 'fs';
 import { describe, expect, it, vi } from 'vitest';
-import type { Config } from './Config';
-import { getConfigPath } from './getConfigPath';
-import { readConfigSync } from './readConfigSync';
-import { resolveConfigSync } from './resolveConfigSync';
+import type { Config } from './Config.js';
+import { getConfigPath } from './getConfigPath.js';
+import { readConfigSync } from './readConfigSync.js';
+import { resolveConfigSync } from './resolveConfigSync.js';
 
 vi.mock('fs');
 vi.mock('./getConfigPath');

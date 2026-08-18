@@ -2,9 +2,9 @@
 
 import { program } from 'commander';
 
-import { create, templates, type CreateOptions } from './actions/create';
-import { DEFAULT_DIR, DEFAULT_TAG } from './core/constants';
-import { resolveConfigSync } from './core/resolveConfigSync';
+import { create, templates, type CreateOptions } from './actions/create.js';
+import { DEFAULT_DIR, DEFAULT_TAG } from './core/constants.js';
+import { resolveConfigSync } from './core/resolveConfigSync.js';
 
 const extensions = Object.keys(templates).join(', ');
 

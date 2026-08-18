@@ -1,3 +1,5 @@
+-- @run always
+
 CREATE OR REPLACE FUNCTION add(integer, integer) RETURNS integer
     AS 'SELECT $1 + $2;'
     LANGUAGE SQL

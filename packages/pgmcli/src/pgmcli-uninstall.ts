@@ -2,9 +2,9 @@
 
 import { program } from 'commander';
 
-import { uninstall, type UninstallOptions } from './actions/uninstall';
-import { attachDefaultOptions } from './core/attachDefaultOptions';
-import { resolveConfigSync } from './core/resolveConfigSync';
+import { uninstall, type UninstallOptions } from './actions/uninstall.js';
+import { attachDefaultOptions } from './core/attachDefaultOptions.js';
+import { resolveConfigSync } from './core/resolveConfigSync.js';
 
 const config = resolveConfigSync(process.argv);
 
