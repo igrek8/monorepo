@@ -22,6 +22,7 @@ export async function status(options: StatusOptions, config?: Config, console = 
     await client.query('BEGIN');
     await client.query(`LOCK TABLE ${table} IN ACCESS EXCLUSIVE MODE`);
     const [migrations, applied] = await Promise.all([
+      // eslint-disable-next-line @typescript-eslint/await-thenable
       getMigrations(resolve(options.dir)),
       getAppliedMigrations(client, table),
     ]);
