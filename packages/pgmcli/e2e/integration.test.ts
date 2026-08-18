@@ -15,6 +15,7 @@ import type { Config } from '../src/core/Config';
 import type { DefaultCommandOptions } from '../src/core/DefaultCommandOptions';
 import { DEFAULT_TAG } from '../src/core/constants';
 import { LogLevel } from '../src/core/logging';
+import { Console } from 'node:console';
 
 async function getFileContent(path: PathLike): Promise<string> {
   return (await fs.readFile(path, 'utf-8')).trim();
@@ -22,7 +23,7 @@ async function getFileContent(path: PathLike): Promise<string> {
 
 const stdout = new PassThrough();
 const stderr = new PassThrough();
-const logger = new console.Console(stdout, stderr);
+const logger = new Console(stdout, stderr);
 const info = vi.spyOn(logger, 'info');
 
 const options: DefaultCommandOptions = {
