@@ -1,5 +1,11 @@
 # pgmcli
 
+## 4.0.0
+
+### Major Changes
+
+- 85fbeb4: Introduce migration params (@run, @transaction) and remove file based "always" migrations. Switch to ESM only
+
 ## 3.1.0
 
 ### Minor Changes
