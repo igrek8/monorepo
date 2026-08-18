@@ -6,6 +6,9 @@
   "version": "4.0.0",
   "type": "module",
   "homepage": "https://igrek8.github.io/monorepo/packages/pgmcli",
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [
     "postgres",
     "migrations",
@@ -17,9 +20,6 @@
   },
   "bugs": {
     "url": "https://github.com/igrek8/monorepo/issues"
-  },
-  "publishConfig": {
-    "access": "public"
   },
   "bin": "dist/pgmcli.js",
   "files": [
